@@ -12,6 +12,10 @@ TAG="v$VERSION"
 COMMIT_HASH=$(git rev-parse HEAD)
 COMMIT_MSG=$(git log -1 --pretty=%B)
 
+# === Environment Variables ===
+REPO="${GIT_REPOSITORY}"  # GitHub Actions sets this automatically
+TOKEN="${GIT_TOKEN}"      # GitHub Actions provides this
+
 # === Build steps ===
 ./Scripts/BinBuilder.sh
 ./Scripts/DebBuilder.sh
