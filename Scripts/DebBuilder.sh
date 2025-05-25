@@ -48,7 +48,8 @@ chmod 755 "$PKG_DIR/usr/local/bin/$APP_NAME"
 dpkg-deb --build "$PKG_DIR"
 
 # === Move and clean up ===
-mv "${PKG_DIR}.deb" "./${APP_NAME}_${VERSION}_${ARCH}.deb"
+mkdir Debian
+mv "${PKG_DIR}.deb" "./Debian/${APP_NAME}_${VERSION}_${ARCH}.deb"
 rm -rf "$PKG_DIR"
 
 echo "✅ .deb package created: ${APP_NAME}_${VERSION}_${ARCH}.deb"

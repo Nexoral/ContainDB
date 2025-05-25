@@ -7,7 +7,7 @@ import (
 	"os/exec"
 	"strings"
 
-	`ContainDB/installation`
+	"ContainDB/installation"
 
 	"github.com/manifoldco/promptui"
 )
