@@ -1,0 +1,19 @@
+name: Run Shell Script on main branch
+
+on:
+  push:
+    branches:
+      - main  # Only trigger on push to main branch
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🧪 Run shell script
+        run: |
+          chmod +x ./Scripts/release.sh
+          ./Scripts/release.sh
