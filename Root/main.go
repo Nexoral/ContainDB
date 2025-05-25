@@ -48,6 +48,11 @@ func startPHPMyAdmin() {
 	}
 	_, selectedContainer, _ := prompt.Run()
 
+	restartFlag := ""
+	if askYesNo("Do you want the container to auto-restart on system startup?") {
+		restartFlag = "--restart unless-stopped"
+	}
+
 	port := askForInput("Enter host port to expose phpMyAdmin", "8080")
 
 	fmt.Printf("Pulling phpMyAdmin image...\n")
@@ -58,7 +63,7 @@ func startPHPMyAdmin() {
 
 	runCmd := fmt.Sprintf(
 		"docker run -d --network ContainDB-Network --name phpmyadmin -e PMA_HOST=%s -p %s:80 phpmyadmin/phpmyadmin",
-		selectedContainer, port,
+		selectedContainer, port, restartFlag,
 	)
 
 	fmt.Println("Running:", runCmd)
