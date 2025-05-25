@@ -62,7 +62,7 @@ func startPHPMyAdmin() {
 	_ = cmd.Run()
 
 	runCmd := fmt.Sprintf(
-		"docker run -d --network ContainDB-Network --name phpmyadmin -e PMA_HOST=%s -p %s:80 phpmyadmin/phpmyadmin",
+		"docker run -d --network ContainDB-Network --name phpmyadmin -e PMA_HOST=%s -p %s:80 phpmyadmin/phpmyadmin %s",
 		selectedContainer, port, restartFlag,
 	)
 
