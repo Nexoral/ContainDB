@@ -8,18 +8,15 @@ ARCH="amd64"
 VERSION_FILE="./VERSION"
 VERSION=$(cat "$VERSION_FILE" | tr -d '[:space:]')
 DEB_FILE="./Debian/${APP_NAME}_${VERSION}_${ARCH}.deb"
-GITHUB_API="https://api.github.com"
-REPO="${GIT_REPOSITORY}"  # GitHub Actions sets this automatically
 TAG="v$VERSION"
-TOKEN="${GIT_TOKEN}"      # GitHub Actions provides this
 COMMIT_HASH=$(git rev-parse HEAD)
 COMMIT_MSG=$(git log -1 --pretty=%B)
 
-# Run other build scripts if needed
+# === Build steps ===
 ./Scripts/BinBuilder.sh
 ./Scripts/DebBuilder.sh
 
-# === Safety checks ===
+# === Checks ===
 if [ ! -f "$VERSION_FILE" ]; then
   echo "❌ VERSION file not found"
   exit 1
@@ -30,44 +27,41 @@ if [ ! -f "$DEB_FILE" ]; then
   exit 1
 fi
 
-if [ -z "$TOKEN" ]; then
-  echo "❌ GITHUB_TOKEN is not set"
-  exit 1
+if ! command -v gh &> /dev/null; then
+  echo "❌ GitHub CLI (gh) not installed"
+
+  # Update package list and install dependencies
+  apt update
+  apt install -y curl gnupg software-properties-common
+
+  # Add GitHub CLI's official package repository
+  curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | \
+    dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+
+  sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | \
+    tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+
+  # Install gh
+  apt update
+  apt install -y gh
+
+
 fi
 
-# === Create GitHub Release ===
-echo "📦 Creating GitHub release for tag $TAG"
+# === Authenticate GitHub CLI ===
+echo "🔑 Authenticating GitHub CLI..."
+echo "${GITHUB_TOKEN}" | gh auth login --with-token
 
-CREATE_RESPONSE=$(curl -s -X POST "$GITHUB_API/repos/$REPO/releases" \
-  -H "Authorization: token $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d @- <<EOF
-{
-  "tag_name": "$TAG",
-  "target_commitish": "$COMMIT_HASH",
-  "name": "$TAG",
-  "body": "🔨 Commit: $COMMIT_HASH\n\n📝 Message:\n$COMMIT_MSG",
-  "draft": false,
-  "prerelease": false
-}
-EOF
-)
+# === Create Release ===
+echo "📦 Creating GitHub release for tag $TAG..."
 
-# === Extract upload URL ===
-UPLOAD_URL=$(echo "$CREATE_RESPONSE" | grep '"upload_url":' | cut -d '"' -f 4 | sed "s/{?name,label}//")
+gh release create "$TAG" "$DEB_FILE" \
+  --title "$TAG" \
+  --notes "🔨 Commit: $COMMIT_HASH
 
-if [ -z "$UPLOAD_URL" ]; then
-  echo "❌ Failed to get upload URL"
-  echo "Response: $CREATE_RESPONSE"
-  exit 1
-fi
-
-# === Upload the .deb file ===
-echo "📤 Uploading $(basename "$DEB_FILE")..."
-
-curl -s --data-binary @"$DEB_FILE" \
-  -H "Authorization: token $TOKEN" \
-  -H "Content-Type: application/vnd.debian.binary-package" \
-  "$UPLOAD_URL?name=$(basename $DEB_FILE)"
+📝 Message:
+$COMMIT_MSG"
 
 echo "✅ GitHub release published with .deb asset"
