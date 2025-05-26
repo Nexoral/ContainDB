@@ -1,8 +1,8 @@
 package Installation
 
 import (
-	`os`
-	`os/exec`
+	"os"
+	"os/exec"
 )
 
 func CreateDockerNetworkIfNotExists() error {

@@ -1,9 +1,9 @@
 package Installation
 
 import (
-	`fmt`
-	`os`
-	`os/exec`
+	"fmt"
+	"os"
+	"os/exec"
 )
 
 func IsDockerInstalled() bool {
