@@ -61,7 +61,7 @@ echo "📦 Creating GitHub release for tag $TAG..."
  echo -e "${CYAN}📡 Creating GitHub release...${RESET}"
 
     RELEASE_RESPONSE=$(curl -s -X POST \
-        -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+        -H "Authorization: Bearer ${TOKEN}" \
         -H "Accept: application/vnd.github+json" \
         https://api.github.com/repos/AnkanSaha/${REPO}/releases \
         -d "{
@@ -83,7 +83,7 @@ echo "📦 Creating GitHub release for tag $TAG..."
 
     echo -e "${CYAN}📦 Uploading .deb to GitHub release..."
     curl -s -X POST \
-        -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+        -H "Authorization: Bearer ${TOKEN}" \
         -H "Content-Type: application/vnd.debian.binary-package" \
         --data-binary @"${DEB_FILE} \
         ""${UPLOAD_URL}"?name=${APP_NAME}"
