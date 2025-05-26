@@ -54,41 +54,16 @@ if ! command -v gh &> /dev/null; then
 
 fi
 
+# === Authenticate GitHub CLI ===
+echo "🔑 Authenticating GitHub CLI..."
+echo "${TOKEN}" | gh auth login --with-token
+
 # === Create Release ===
 echo "📦 Creating GitHub release for tag $TAG..."
 
-
- echo -e "${CYAN}📡 Creating GitHub release...${RESET}"
-
-    RELEASE_RESPONSE=$(curl -s -X POST \
-        -H "Authorization: Bearer ${TOKEN}" \
-        -H "Accept: application/vnd.github+json" \
-        https://api.github.com/repos/AnkanSaha/${REPO}/releases \
-        -d "{
-            \"tag_name\": \"v$VERSION\",
-            \"target_commitish\": \"main\",
-            \"name\": \"v$VERSION\",
-            \"body\": \"Auto-generated release for 🔨 Commit: $COMMIT_HASH\",
-            \"draft\": false,
-            \"prerelease\": false
-        }")
-
-    UPLOAD_URL=$(echo "$RELEASE_RESPONSE" | grep upload_url | cut -d '"' -f 4 | cut -d '{' -f 1)
-
-    if [ -z "$UPLOAD_URL" ]; then
-        echo -e "${RED}❌ Failed to create GitHub release."
-        echo "$RELEASE_RESPONSE"
-        exit 1
-    fi
-
-    echo -e "${CYAN}📦 Uploading .deb to GitHub release..."
-    curl -s -X POST \
-        -H "Authorization: Bearer ${TOKEN}" \
-        -H "Content-Type: application/vnd.debian.binary-package" \
-        --data-binary @"${DEB_FILE} \
-        ""${UPLOAD_URL}"?name=${APP_NAME}"
-
-    echo -e "🎉 Uploaded ${APP_NAME} to GitHub Releases successfully!"
+gh release create "$TAG" "$DEB_FILE" \
+  --title "$TAG" \
+  --notes "🔨 Commit: $COMMIT_HASH
 
 📝 Message:
 $COMMIT_MSG"
