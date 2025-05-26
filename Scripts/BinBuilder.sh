@@ -20,6 +20,6 @@ mkdir -p "$BUILD_OUTPUT_DIR"
 
 # Build the Go project with -o flag
 echo "Building the project..."
-go build -o "$BINARY_PATH" ./Root
+go build -o "$BINARY_PATH" ./src/Root
 
 echo "Build complete. Binary available at $BINARY_PATH"
