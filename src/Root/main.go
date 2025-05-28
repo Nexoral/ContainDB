@@ -14,28 +14,14 @@ import (
 func selectDatabase() string {
 	prompt := promptui.Select{
 		Label: "Select the service to start",
-		Items: []string{"mongodb", "redis", "mysql", "postgresql", "cassandra", "phpmyadmin", "MongoDB "},
+		Items: []string{"mongodb", "redis", "mysql", "postgresql", "cassandra", "phpmyadmin", "MongoDB Compass", "RedisInsight"},
 	}
 	_, result, _ := prompt.Run()
 	return result
 }
 
-func listSQLContainers() []string {
-	cmd := exec.Command("bash", "-c", "docker ps --format '{{.Names}} {{.Image}}' | grep -E 'mysql|postgres'")
-	output, _ := cmd.Output()
-
-	lines := strings.Split(strings.TrimSpace(string(output)), "\n")
-	containers := []string{}
-	for _, line := range lines {
-		if parts := strings.Fields(line); len(parts) > 0 {
-			containers = append(containers, parts[0])
-		}
-	}
-	return containers
-}
-
 func startPHPMyAdmin() {
-	sqlContainers := listSQLContainers()
+	sqlContainers := Docker.ListSQLContainers()
 	if len(sqlContainers) == 0 {
 		fmt.Println("No running MySQL/PostgreSQL containers found.")
 		return
@@ -68,6 +54,30 @@ func startPHPMyAdmin() {
 		fmt.Println("Error starting phpMyAdmin:", err)
 	} else {
 		fmt.Printf("phpMyAdmin started. Access it at http://localhost:%s\n", port)
+	}
+}
+
+func DownloadMongoDBCompass() {
+	fmt.Println("Downloading MongoDB Compass...")
+	cmd := exec.Command("bash", "-c", "wget -qO- https://downloads.mongodb.com/compass/mongodb-compass_1.34.0_amd64.deb | sudo dpkg -i -")
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		fmt.Println("Error downloading MongoDB Compass:", err)
+	} else {
+		fmt.Println("MongoDB Compass downloaded and installed successfully.")
+	}
+}
+
+func DownloadRedisInsight() {
+	fmt.Println("Downloading RedisInsight...")
+	cmd := exec.Command("bash", "-c", "wget -qO- https://download.redisinsight.redis.com/latest/redisinsight-linux-x64.tar.gz | tar xz -C /opt")
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		fmt.Println("Error downloading RedisInsight:", err)
+	} else {
+		fmt.Println("RedisInsight downloaded and installed successfully.")
 	}
 }
 
@@ -154,6 +164,32 @@ func startContainer(database string) {
 		fmt.Println("Error starting container:", err)
 	} else {
 		fmt.Println("Container started successfully.")
+
+		if database == "mysql" || database == "postgresql" {
+			consentPhpMyAdmin := Docker.AskYesNo("Do you want to install phpMyAdmin for this database?")
+			if consentPhpMyAdmin {
+				startPHPMyAdmin()
+			} else {
+				fmt.Println("You can install phpMyAdmin later using the 'phpmyadmin' option.")
+			}
+		}
+		if database == "mongodb" {
+			consentCompass := Docker.AskYesNo("Do you want to install MongoDB Compass?")
+			if consentCompass {
+				DownloadMongoDBCompass()
+			} else {
+				fmt.Println("You can install MongoDB Compass later using the 'mongodb compass' option.")
+			}
+		}
+
+		if database == "redis" {
+			consentRedisInsight := Docker.AskYesNo("Do you want to install RedisInsight?")
+			if consentRedisInsight {
+				DownloadRedisInsight()
+			} else {
+				fmt.Println("You can install RedisInsight later using the 'redis insight' option.")
+			}
+		}
 	}
 }
 
@@ -176,6 +212,12 @@ func main() {
 	database := selectDatabase()
 	if database == "phpmyadmin" {
 		startPHPMyAdmin()
+	}
+	if database == "MongoDB Compass" {
+		DownloadMongoDBCompass()
+	}
+	if database == "RedisInsight" {
+		DownloadRedisInsight()
 	} else {
 		startContainer(database)
 	}
