@@ -22,3 +22,17 @@ func IsContainerRunning(image string) bool {
 	output, _ := cmd.Output()
 	return strings.TrimSpace(string(output)) != ""
 }
+
+func ListSQLContainers() []string {
+	cmd := exec.Command("bash", "-c", "docker ps --format '{{.Names}} {{.Image}}' | grep -E 'mysql|postgres'")
+	output, _ := cmd.Output()
+
+	lines := strings.Split(strings.TrimSpace(string(output)), "\n")
+	var containers []string
+	for _, line := range lines {
+		if parts := strings.Fields(line); len(parts) > 0 {
+			containers = append(containers, parts[0])
+		}
+	}
+	return containers
+}
