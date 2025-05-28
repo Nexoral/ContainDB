@@ -7,14 +7,14 @@ import (
 	"os/exec"
 	"strings"
 
-	"ContainDB/src/installation"
+	"ContainDB/src/Docker"
 	"github.com/manifoldco/promptui"
 )
 
 func selectDatabase() string {
 	prompt := promptui.Select{
 		Label: "Select the service to start",
-		Items: []string{"mongodb", "redis", "mysql", "postgresql", "cassandra", "phpmyadmin"},
+		Items: []string{"mongodb", "redis", "mysql", "postgresql", "cassandra", "phpmyadmin", "MongoDB "},
 	}
 	_, result, _ := prompt.Run()
 	return result
@@ -71,21 +71,6 @@ func startPHPMyAdmin() {
 	}
 }
 
-func isContainerRunning(image string) bool {
-	cmd := exec.Command("bash", "-c", fmt.Sprintf("docker ps --filter ancestor=%s --format '{{.Names}}'", image))
-	output, _ := cmd.Output()
-	return strings.TrimSpace(string(output)) != ""
-}
-
-func askYesNo(label string) bool {
-	prompt := promptui.Select{
-		Label: label,
-		Items: []string{"Yes", "No"},
-	}
-	index, _, _ := prompt.Run()
-	return index == 0
-}
-
 func askForInput(label, defaultValue string) string {
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Printf("%s [%s]: ", label, defaultValue)
@@ -117,7 +102,7 @@ func startContainer(database string) {
 	image := imageMap[database]
 	port := defaultPorts[database]
 
-	if isContainerRunning(image) {
+	if Docker.IsContainerRunning(image) {
 		fmt.Printf("Database %s is already running on port %s\n", database, port)
 		return
 	}
@@ -131,8 +116,8 @@ func startContainer(database string) {
 
 	// Ask for port mapping
 	portMapping := ""
-	if askYesNo("Do you want to map container port with host?") {
-		customPort := askYesNo("Do you want to use custom host port?")
+	if Docker.AskYesNo("Do you want to map container port with host?") {
+		customPort := Docker.AskYesNo("Do you want to use custom host port?")
 		if customPort {
 			hostPort := askForInput("Enter custom host port", port)
 			portMapping = fmt.Sprintf("-p %s:%s", hostPort, port)
@@ -142,7 +127,7 @@ func startContainer(database string) {
 	}
 
 	restartFlag := ""
-	if askYesNo("Do you want the container to auto-restart on system startup?") {
+	if Docker.AskYesNo("Do you want the container to auto-restart on system startup?") {
 		restartFlag = "--restart unless-stopped"
 	}
 
@@ -173,8 +158,8 @@ func startContainer(database string) {
 }
 
 func main() {
-	if !Installation.IsDockerInstalled() {
-		err := Installation.InstallDocker()
+	if !Docker.IsDockerInstalled() {
+		err := Docker.InstallDocker()
 		if err != nil {
 			fmt.Println("Failed to install Docker:", err)
 			return
@@ -182,7 +167,7 @@ func main() {
 		fmt.Println("Docker installed successfully! Please restart the terminal or log out & log in again.")
 	}
 
-	err := Installation.CreateDockerNetworkIfNotExists()
+	err := Docker.CreateDockerNetworkIfNotExists()
 	if err != nil {
 		fmt.Println("Failed to create Docker network:", err)
 		return

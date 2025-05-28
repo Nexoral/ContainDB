@@ -1,4 +1,4 @@
-package Installation
+package Docker
 
 import (
 	"fmt"

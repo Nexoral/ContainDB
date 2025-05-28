@@ -33,4 +33,14 @@ fi
 
 # Prompt for new version
 read -p "Enter new version: " new_version
-# ...existing comparison and update logic...
+
+# Validate version format
+if ! [[ "$new_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  echo "Error: Invalid version format. Use X.Y.Z (e.g., 1.0.0)."
+  exit 1
+fi
+
+# Update local version file
+echo "$new_version" > "$(dirname "$0")/../VERSION"
+
+echo "Local version updated to $new_version."
