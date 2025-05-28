@@ -42,7 +42,7 @@ func startPHPMyAdmin() {
 	_ = cmd.Run()
 
 	runCmd := fmt.Sprintf(
-		"docker run -d --restart unless-stopped --network ContainDB-Network --name phpmyadmin -e PMA_HOST=%s -p %s:80 phpmyadmin/phpmyadmin %s",
+		"docker run -d --restart unless-stopped --network ContainDB-Network --name phpmyadmin -e PMA_HOST=%s -p %s:80 phpmyadmin/phpmyadmin",
 		selectedContainer, port,
 	)
 
@@ -71,13 +71,22 @@ func DownloadMongoDBCompass() {
 
 func DownloadRedisInsight() {
 	fmt.Println("Downloading RedisInsight...")
-	cmd := exec.Command("bash", "-c", "wget -qO- https://download.redisinsight.redis.com/latest/redisinsight-linux-x64.tar.gz | tar xz -C /opt")
+	cmd := exec.Command("docker", "pull", "redis/redisinsight:latest")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
 		fmt.Println("Error downloading RedisInsight:", err)
 	} else {
-		fmt.Println("RedisInsight downloaded and installed successfully.")
+		command := exec.Command("docker", "run", "-d", "--name", "redisinsight", "-p", "8001:8001", "redis/redisinsight:latest")
+		command.Stdout = os.Stdout
+		command.Stderr = os.Stderr
+
+		if err := command.Run(); err != nil {
+			fmt.Println("Error starting RedisInsight container:", err)
+		} else {
+			fmt.Println("RedisInsight started successfully. Access it at http://localhost:8001")
+
+		}
 	}
 }
 
@@ -94,19 +103,21 @@ func askForInput(label, defaultValue string) string {
 
 func startContainer(database string) {
 	imageMap := map[string]string{
-		"mongodb":    "mongo",
-		"redis":      "redis",
-		"mysql":      "mysql",
-		"postgresql": "postgres",
-		"cassandra":  "cassandra",
+		"mongodb":       "mongo",
+		"redis":         "redis",
+		"mysql":         "mysql",
+		"postgresql":    "postgres",
+		"cassandra":     "cassandra",
+		"redis insight": "redis/redisinsight:latest",
 	}
 
 	defaultPorts := map[string]string{
-		"mongodb":    "27017",
-		"redis":      "6379",
-		"mysql":      "3306",
-		"postgresql": "5432",
-		"cassandra":  "9042",
+		"mongodb":       "27017",
+		"redis":         "6379",
+		"mysql":         "3306",
+		"postgresql":    "5432",
+		"cassandra":     "9042",
+		"redis insight": "8001",
 	}
 
 	image := imageMap[database]
@@ -215,9 +226,6 @@ func main() {
 	}
 	if database == "MongoDB Compass" {
 		DownloadMongoDBCompass()
-	}
-	if database == "RedisInsight" {
-		DownloadRedisInsight()
 	} else {
 		startContainer(database)
 	}
