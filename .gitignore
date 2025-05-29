@@ -1,4 +1,2 @@
-./bin
-./ContainDB
-./*.deb
-./Debian
+bin
+Debian

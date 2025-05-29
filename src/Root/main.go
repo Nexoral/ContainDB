@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"ContainDB/src/Docker"
+	"ContainDB/src/Tools"
 	"github.com/manifoldco/promptui"
 )
 
@@ -57,42 +58,7 @@ func startPHPMyAdmin() {
 	}
 }
 
-func DownloadMongoDBCompass() {
-	fmt.Println("Downloading MongoDB Compass...")
-	// Download the deb file first
-	cmd := exec.Command("bash", "-c", "wget -q https://downloads.mongodb.com/compass/mongodb-compass_1.46.2_amd64.deb -O /tmp/mongodb-compass.deb")
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	if err := cmd.Run(); err != nil {
-		fmt.Println("Error downloading MongoDB Compass:", err)
-		return
-	}
-	
-	// Install the downloaded deb file
-	installCmd := exec.Command("sudo", "dpkg", "-i", "/tmp/mongodb-compass.deb")
-	installCmd.Stdout = os.Stdout
-	installCmd.Stderr = os.Stderr
-	if err := installCmd.Run(); err != nil {
-		fmt.Println("Error installing MongoDB Compass:", err)
-	} else {
-		fmt.Println("MongoDB Compass downloaded and installed successfully.")
 
-		// Clean up the downloaded file
-		cleanupCmd := exec.Command("rm", "/tmp/mongodb-compass.deb")
-		cleanupCmd.Stdout = os.Stdout
-		cleanupCmd.Stderr = os.Stderr
-		if err := cleanupCmd.Run(); err != nil {
-			fmt.Println("Error cleaning up downloaded file:", err)
-		} else {
-			fmt.Println("Temporary files cleaned up successfully.")
-		}
-		fmt.Println("You can now launch MongoDB Compass from your applications menu or by running 'mongodb-compass' in the terminal.")
-		fmt.Println("Note: If you encounter any issues, please ensure you have the necessary dependencies installed.")
-		fmt.Println("For more information, visit: https://www.mongodb.com/docs/compass/current/install/")
-		fmt.Println("Enjoy using MongoDB Compass!")
-		
-	}
-}
 
 func DownloadRedisInsight() {
 	fmt.Println("Downloading RedisInsight...")
@@ -212,7 +178,7 @@ func startContainer(database string) {
 		if database == "mongodb" {
 			consentCompass := Docker.AskYesNo("Do you want to install MongoDB Compass?")
 			if consentCompass {
-				DownloadMongoDBCompass()
+				Tools.DownloadMongoDBCompass()
 			} else {
 				fmt.Println("You can install MongoDB Compass later using the 'mongodb compass' option.")
 			}
@@ -250,7 +216,7 @@ func main() {
 		startPHPMyAdmin()
 	}
 	if database == "MongoDB Compass" {
-		DownloadMongoDBCompass()
+		Tools.DownloadMongoDBCompass()
 	} else {
 		startContainer(database)
 	}
