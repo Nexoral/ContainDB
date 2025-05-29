@@ -21,42 +21,7 @@ func selectDatabase() string {
 	return result
 }
 
-func startPHPMyAdmin() {
-	sqlContainers := Docker.ListSQLContainers()
-	if len(sqlContainers) == 0 {
-		fmt.Println("No running MySQL/PostgreSQL containers found.")
-		return
-	}
 
-	prompt := promptui.Select{
-		Label: "Select a SQL container to link with phpMyAdmin",
-		Items: sqlContainers,
-	}
-	_, selectedContainer, _ := prompt.Run()
-
-	port := askForInput("Enter host port to expose phpMyAdmin", "8080")
-
-	fmt.Printf("Pulling phpMyAdmin image...\n")
-	cmd := exec.Command("docker", "pull", "phpmyadmin/phpmyadmin")
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	_ = cmd.Run()
-
-	runCmd := fmt.Sprintf(
-		"docker run -d --restart unless-stopped --network ContainDB-Network --name phpmyadmin -e PMA_HOST=%s -p %s:80 phpmyadmin/phpmyadmin",
-		selectedContainer, port,
-	)
-
-	fmt.Println("Running:", runCmd)
-	cmd = exec.Command("bash", "-c", runCmd)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	if err := cmd.Run(); err != nil {
-		fmt.Println("Error starting phpMyAdmin:", err)
-	} else {
-		fmt.Printf("phpMyAdmin started. Access it at http://localhost:%s\n", port)
-	}
-}
 
 
 
@@ -170,7 +135,7 @@ func startContainer(database string) {
 		if database == "mysql" || database == "postgresql" {
 			consentPhpMyAdmin := Docker.AskYesNo("Do you want to install phpMyAdmin for this database?")
 			if consentPhpMyAdmin {
-				startPHPMyAdmin()
+				Tools.StartPHPMyAdmin()
 			} else {
 				fmt.Println("You can install phpMyAdmin later using the 'phpmyadmin' option.")
 			}
@@ -213,7 +178,7 @@ func main() {
 
 	database := selectDatabase()
 	if database == "phpmyadmin" {
-		startPHPMyAdmin()
+		Tools.StartPHPMyAdmin()
 	}
 	if database == "MongoDB Compass" {
 		Tools.DownloadMongoDBCompass()
