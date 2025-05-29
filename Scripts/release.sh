@@ -7,18 +7,18 @@ APP_NAME="containdb"
 ARCH="amd64"
 VERSION_FILE="./VERSION"
 VERSION=$(cat "$VERSION_FILE" | tr -d '[:space:]')
-DEB_FILE="./Debian/${APP_NAME}_${VERSION}_${ARCH}.deb"
+DEB_FILE="./Packages/${APP_NAME}_${VERSION}_${ARCH}.deb"
 TAG="v$VERSION"
 COMMIT_HASH=$(git rev-parse HEAD)
 COMMIT_MSG=$(git log -1 --pretty=%B)
 
 # === Environment Variables ===
-REPO="${GIT_REPOSITORY}"  # GitHub Actions sets this automatically
-TOKEN="${GIT_TOKEN}"      # GitHub Actions provides this
+REPO="${GIT_REPOSITORY}" # GitHub Actions sets this automatically
+TOKEN="${GIT_TOKEN}"     # GitHub Actions provides this
 
 # === Build steps ===
 ./Scripts/BinBuilder.sh
-./Scripts/DebBuilder.sh
+./Scripts/PackageBuilder.sh
 
 # === Checks ===
 if [ ! -f "$VERSION_FILE" ]; then
@@ -31,7 +31,7 @@ if [ ! -f "$DEB_FILE" ]; then
   exit 1
 fi
 
-if ! command -v gh &> /dev/null; then
+if ! command -v gh &>/dev/null; then
   echo "❌ GitHub CLI (gh) not installed"
 
   # Update package list and install dependencies
@@ -39,18 +39,17 @@ if ! command -v gh &> /dev/null; then
   apt install -y curl gnupg software-properties-common
 
   # Add GitHub CLI's official package repository
-  curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | \
+  curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg |
     dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
 
   sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
 
-  echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | \
-    tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" |
+    tee /etc/apt/sources.list.d/github-cli.list >/dev/null
 
   # Install gh
   apt update
   apt install -y gh
-
 
 fi
 
