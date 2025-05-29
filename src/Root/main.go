@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"ContainDB/src/Docker"
+	"ContainDB/src/Tools"
 	"github.com/manifoldco/promptui"
 )
 
@@ -57,17 +58,7 @@ func startPHPMyAdmin() {
 	}
 }
 
-func DownloadMongoDBCompass() {
-	fmt.Println("Downloading MongoDB Compass...")
-	cmd := exec.Command("bash", "-c", "wget -qO- https://downloads.mongodb.com/compass/mongodb-compass_1.34.0_amd64.deb | sudo dpkg -i -")
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	if err := cmd.Run(); err != nil {
-		fmt.Println("Error downloading MongoDB Compass:", err)
-	} else {
-		fmt.Println("MongoDB Compass downloaded and installed successfully.")
-	}
-}
+
 
 func DownloadRedisInsight() {
 	fmt.Println("Downloading RedisInsight...")
@@ -187,7 +178,7 @@ func startContainer(database string) {
 		if database == "mongodb" {
 			consentCompass := Docker.AskYesNo("Do you want to install MongoDB Compass?")
 			if consentCompass {
-				DownloadMongoDBCompass()
+				Tools.DownloadMongoDBCompass()
 			} else {
 				fmt.Println("You can install MongoDB Compass later using the 'mongodb compass' option.")
 			}
@@ -225,7 +216,7 @@ func main() {
 		startPHPMyAdmin()
 	}
 	if database == "MongoDB Compass" {
-		DownloadMongoDBCompass()
+		Tools.DownloadMongoDBCompass()
 	} else {
 		startContainer(database)
 	}
