@@ -8,7 +8,7 @@ ARCH="amd64"
 VERSION_FILE="./VERSION"
 VERSION=$(cat "$VERSION_FILE" | tr -d '[:space:]')
 # collect all debs for this version
-DEB_FILES=(./Packages/${APP_NAME}_${VERSION}_*.deb)
+DEB_FILES=(./Packages/${APP_NAME}_${VERSION}_*) # to collect all files
 
 TAG="v$VERSION"
 COMMIT_HASH=$(git rev-parse HEAD)
