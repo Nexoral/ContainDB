@@ -14,6 +14,13 @@ if [[ "$VERSION" != *-stable ]]; then
   exit 0
 fi
 
+# === Build steps ===
+./Scripts/BinBuilder.sh
+echo "🔨 Binary Building completed of $APP_NAME version $VERSION for $ARCH"
+
+./Scripts/PackageBuilder.sh
+echo "📦 Package Building completed of $APP_NAME version $VERSION for $ARCH"
+
 # collect all debs for this version
 DEB_FILES=(./Packages/${APP_NAME}_${VERSION}_*) # to collect all files
 
@@ -24,13 +31,6 @@ COMMIT_MSG=$(git log -1 --pretty=%B)
 # === Environment Variables ===
 REPO="${GIT_REPOSITORY}" # GitHub Actions sets this automatically
 TOKEN="${GIT_TOKEN}"     # GitHub Actions provides this
-
-# === Build steps ===
-./Scripts/BinBuilder.sh
-echo "🔨 Binary Building completed of $APP_NAME version $VERSION for $ARCH"
-
-./Scripts/PackageBuilder.sh
-echo "📦 Package Building completed of $APP_NAME version $VERSION for $ARCH"
 
 # === Checks ===
 if [ ! -f "$VERSION_FILE" ]; then

@@ -15,61 +15,13 @@ import (
 func selectDatabase() string {
 	prompt := promptui.Select{
 		Label: "Select the service to start",
-		Items: []string{"mongodb", "redis", "mysql", "postgresql", "cassandra", "phpmyadmin", "MongoDB Compass", "RedisInsight"},
+		Items: []string{"mongodb", "redis", "mysql", "postgresql", "cassandra", "MariaDB", "phpmyadmin", "MongoDB Compass", "RedisInsight"},
 	}
 	_, result, _ := prompt.Run()
 	return result
 }
 
-func StartRedisInsight() {
-	redisContainers := Docker.ListOfContainers([]string{"redis", "redis-stack", "redis-enterprise"})
-	if len(redisContainers) == 0 {
-		fmt.Println("No running Redis containers found.")
-		return
-	}
 
-	prompt := promptui.Select{
-		Label: "Select a Redis container to connect with RedisInsight",
-		Items: redisContainers,
-	}
-	_, selectedContainer, _ := prompt.Run()
-
-	port := askForInput("Enter host port to expose RedisInsight", "5540")
-
-	fmt.Println("Pulling RedisInsight image...")
-	cmd := exec.Command("docker", "pull", "redis/redisinsight:latest")
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	if err := cmd.Run(); err != nil {
-		fmt.Println("Error pulling RedisInsight:", err)
-		return
-	}
-
-	// Get IP address of selected redis container
-	ipCmd := exec.Command("bash", "-c", fmt.Sprintf("docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' %s", selectedContainer))
-	ipOut, err := ipCmd.Output()
-	if err != nil {
-		fmt.Println("Failed to get Redis container IP:", err)
-		return
-	}
-	redisIP := strings.TrimSpace(string(ipOut))
-
-	runCmd := fmt.Sprintf(
-		`docker run -d --name redisinsight -p %s:5540 -e RI_REDIS_HOST=%s redis/redisinsight:latest`,
-		port, redisIP,
-	)
-
-	fmt.Println("Running:", runCmd)
-	cmd = exec.Command("bash", "-c", runCmd)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-
-	if err := cmd.Run(); err != nil {
-		fmt.Println("Error starting RedisInsight container:", err)
-	} else {
-		fmt.Printf("RedisInsight started. Access it at http://localhost:%s\n", port)
-	}
-}
 
 func askForInput(label, defaultValue string) string {
 	reader := bufio.NewReader(os.Stdin)
@@ -89,7 +41,7 @@ func startContainer(database string) {
 		"mysql":         "mysql",
 		"postgresql":    "postgres",
 		"cassandra":     "cassandra",
-		"redis insight": "redis/redisinsight:latest",
+		"mariaDB":      "mariadb",
 	}
 
 	defaultPorts := map[string]string{
@@ -98,7 +50,7 @@ func startContainer(database string) {
 		"mysql":         "3306",
 		"postgresql":    "5432",
 		"cassandra":     "9042",
-		"redis insight": "8001",
+		"mariaDB":      "3306",
 	}
 
 	image := imageMap[database]
@@ -134,7 +86,8 @@ func startContainer(database string) {
 	}
 
 	env := ""
-	if database == "mysql" || database == "postgresql" {
+	if database == "mysql" || database == "postgresql" || database == "mariaDB" {
+		fmt.Println("You need to set environment variables for the database.")
 		user := askForInput("Enter root username", "root")
 		pass := askForInput("Enter root password", "password")
 
@@ -142,6 +95,8 @@ func startContainer(database string) {
 			env = fmt.Sprintf("-e MYSQL_ROOT_PASSWORD=%s", pass)
 		} else if database == "postgresql" {
 			env = fmt.Sprintf("-e POSTGRES_PASSWORD=%s -e POSTGRES_USER=%s", pass, user)
+		} else if database == "mariaDB" {
+			env = fmt.Sprintf("-e MYSQL_ROOT_PASSWORD=%s", pass)
 		}
 
 	}
@@ -177,7 +132,7 @@ func startContainer(database string) {
 		if database == "redis" {
 			consentRedisInsight := Docker.AskYesNo("Do you want to install Redis Insight?")
 			if consentRedisInsight {
-				StartRedisInsight()
+				Tools.StartRedisInsight()
 			} else {
 				fmt.Println("You can install RedisInsight later using the 'redis insight' option.")
 			}
@@ -206,7 +161,10 @@ func main() {
 		Tools.StartPHPMyAdmin()
 	}
 	if database == "MongoDB Compass" {
-		Tools.DownloadMongoDBCompass()
+		Tools.DownloadMongoDBCompass();
+	} 
+	if database == "RedisInsight" {
+		Tools.StartRedisInsight();
 	} else {
 		startContainer(database)
 	}
