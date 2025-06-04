@@ -96,7 +96,7 @@ func startContainer(database string) {
 		} else if database == "postgresql" {
 			env = fmt.Sprintf("-e POSTGRES_PASSWORD=%s -e POSTGRES_USER=%s", pass, user)
 		} else if database == "mariaDB" {
-			env = fmt.Sprintf("-e MYSQL_ROOT_PASSWORD=%s", pass)
+			env = fmt.Sprintf("-e MARIADB_ROOT_PASSWORD=%s", pass)
 		}
 
 	}
@@ -112,7 +112,7 @@ func startContainer(database string) {
 	} else {
 		fmt.Println("Container started successfully.")
 
-		if database == "mysql" || database == "postgresql" {
+		if database == "mysql" || database == "postgresql" || database == "mariaDB" {
 			consentPhpMyAdmin := Docker.AskYesNo("Do you want to install phpMyAdmin for this database?")
 			if consentPhpMyAdmin {
 				Tools.StartPHPMyAdmin()
