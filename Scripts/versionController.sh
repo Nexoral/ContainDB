@@ -15,7 +15,63 @@ echo "Local version: $local_version"
 # Compare versions: returns 0 if first > second
 ver_gt() {
   local IFS=.
-  local i ver1=($1) ver2=($2)
+  local raw1 raw2 i ver1 ver2
+  # Strip suffix from versions (ignore -beta or -stable)
+  raw1="${1%%-*}"
+  raw2="${2%%-*}"
+  ver1=($raw1) ver2=($raw2)
+  # Add version type selection using arrow keys
+  echo "Select version type:"
+  options=("Stable" "Beta")
+  selected=0
+
+  # ANSI codes for cursor movement and clearing
+  tput civis # Hide cursor
+
+  # Display function
+  function show_menu() {
+    for i in ${!options[@]}; do
+      if [[ $i -eq $selected ]]; then
+        echo -e "\033[7m> ${options[$i]}\033[0m" # Highlighted
+      else
+        echo "  ${options[$i]}"
+      fi
+    done
+  }
+
+  # Clear previous output and show menu
+  function refresh() {
+    tput cup 4 0
+    tput ed
+    show_menu
+  }
+
+  # Initial display
+  show_menu
+
+  # Handle key input
+  while true; do
+    read -rsn3 key
+    case "$key" in
+    $'\x1b[A') # Up arrow
+      ((selected--))
+      if ((selected < 0)); then selected=$((${#options[@]} - 1)); fi
+      refresh
+      ;;
+    $'\x1b[B') # Down arrow
+      ((selected++))
+      if ((selected >= ${#options[@]})); then selected=0; fi
+      refresh
+      ;;
+    "") # Enter key
+      version_type="${options[$selected]}"
+      break
+      ;;
+    esac
+  done
+
+  tput cnorm # Show cursor again
+  echo -e "\nSelected: $version_type"
   for ((i = ${#ver1[@]}; i < ${#ver2[@]}; i++)); do ver1[i]=0; done
   for ((i = ${#ver2[@]}; i < ${#ver1[@]}; i++)); do ver2[i]=0; done
   for ((i = 0; i < ${#ver1[@]}; i++)); do
@@ -41,6 +97,7 @@ if ! [[ "$new_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
 fi
 
 # Update local version file
-echo "$new_version" >"$(dirname "$0")/../VERSION"
+suffix=$(echo "$version_type" | tr '[:upper:]' '[:lower:]')
+echo "${new_version}-${suffix}" >"$(dirname "$0")/../VERSION"
 
-echo "Local version updated to $new_version"
+echo "Local version updated to ${new_version}-${suffix}"
