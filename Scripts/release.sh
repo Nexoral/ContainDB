@@ -20,7 +20,10 @@ TOKEN="${GIT_TOKEN}"     # GitHub Actions provides this
 
 # === Build steps ===
 ./Scripts/BinBuilder.sh
+echo "🔨 Binary Building completed of $APP_NAME version $VERSION for $ARCH"
+
 ./Scripts/PackageBuilder.sh
+echo "📦 Package Building completed of $APP_NAME version $VERSION for $ARCH"
 
 # === Checks ===
 if [ ! -f "$VERSION_FILE" ]; then

@@ -23,7 +23,7 @@ func askForInput(label, defaultValue string) string {
 }
 
 func StartPHPMyAdmin() {
-	sqlContainers := Docker.ListSQLContainers()
+	sqlContainers := Docker.ListOfContainers([]string{"mysql", "postgres"})
 	if len(sqlContainers) == 0 {
 		fmt.Println("No running MySQL/PostgreSQL containers found.")
 		return
