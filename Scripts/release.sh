@@ -7,6 +7,13 @@ APP_NAME="containdb"
 ARCH="amd64"
 VERSION_FILE="./VERSION"
 VERSION=$(cat "$VERSION_FILE" | tr -d '[:space:]')
+
+# ensure only stable versions are published
+if [[ "$VERSION" != *-stable ]]; then
+  echo "❌ Stable version required to publish release. Current version: $VERSION"
+  exit 0
+fi
+
 # collect all debs for this version
 DEB_FILES=(./Packages/${APP_NAME}_${VERSION}_*) # to collect all files
 
