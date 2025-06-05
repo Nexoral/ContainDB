@@ -9,19 +9,18 @@ import (
 
 	"ContainDB/src/Docker"
 	"ContainDB/src/Tools"
+
 	"github.com/manifoldco/promptui"
 )
 
 func selectDatabase() string {
 	prompt := promptui.Select{
 		Label: "Select the service to start",
-		Items: []string{"mongodb", "redis", "mysql", "postgresql", "cassandra", "MariaDB", "phpmyadmin", "MongoDB Compass", "RedisInsight"},
+		Items: []string{"mongodb", "redis", "mysql", "postgresql", "cassandra", "mariadb", "phpmyadmin", "MongoDB Compass", "RedisInsight"},
 	}
 	_, result, _ := prompt.Run()
 	return result
 }
-
-
 
 func askForInput(label, defaultValue string) string {
 	reader := bufio.NewReader(os.Stdin)
@@ -36,21 +35,21 @@ func askForInput(label, defaultValue string) string {
 
 func startContainer(database string) {
 	imageMap := map[string]string{
-		"mongodb":       "mongo",
-		"redis":         "redis",
-		"mysql":         "mysql",
-		"postgresql":    "postgres",
-		"cassandra":     "cassandra",
-		"mariaDB":      "mariadb",
+		"mongodb":    "mongo",
+		"redis":      "redis",
+		"mysql":      "mysql",
+		"postgresql": "postgres",
+		"cassandra":  "cassandra",
+		"mariadb":    "mariadb",
 	}
 
 	defaultPorts := map[string]string{
-		"mongodb":       "27017",
-		"redis":         "6379",
-		"mysql":         "3306",
-		"postgresql":    "5432",
-		"cassandra":     "9042",
-		"mariaDB":      "3306",
+		"mongodb":    "27017",
+		"redis":      "6379",
+		"mysql":      "3306",
+		"postgresql": "5432",
+		"cassandra":  "9042",
+		"mariadb":    "3306",
 	}
 
 	image := imageMap[database]
@@ -86,7 +85,7 @@ func startContainer(database string) {
 	}
 
 	env := ""
-	if database == "mysql" || database == "postgresql" || database == "mariaDB" {
+	if database == "mysql" || database == "postgresql" || database == "mariadb" {
 		fmt.Println("You need to set environment variables for the database.")
 		user := askForInput("Enter root username", "root")
 		pass := askForInput("Enter root password", "password")
@@ -95,7 +94,7 @@ func startContainer(database string) {
 			env = fmt.Sprintf("-e MYSQL_ROOT_PASSWORD=%s", pass)
 		} else if database == "postgresql" {
 			env = fmt.Sprintf("-e POSTGRES_PASSWORD=%s -e POSTGRES_USER=%s", pass, user)
-		} else if database == "mariaDB" {
+		} else if database == "mariadb" {
 			env = fmt.Sprintf("-e MARIADB_ROOT_PASSWORD=%s", pass)
 		}
 
@@ -112,7 +111,7 @@ func startContainer(database string) {
 	} else {
 		fmt.Println("Container started successfully.")
 
-		if database == "mysql" || database == "postgresql" || database == "mariaDB" {
+		if database == "mysql" || database == "postgresql" || database == "mariadb" {
 			consentPhpMyAdmin := Docker.AskYesNo("Do you want to install phpMyAdmin for this database?")
 			if consentPhpMyAdmin {
 				Tools.StartPHPMyAdmin()
@@ -141,6 +140,12 @@ func startContainer(database string) {
 }
 
 func main() {
+	// require sudo
+	if os.Geteuid() != 0 {
+		fmt.Println("❌ Please run this program with sudo")
+		os.Exit(1)
+	}
+
 	if !Docker.IsDockerInstalled() {
 		err := Docker.InstallDocker()
 		if err != nil {
@@ -161,10 +166,10 @@ func main() {
 		Tools.StartPHPMyAdmin()
 	}
 	if database == "MongoDB Compass" {
-		Tools.DownloadMongoDBCompass();
-	} 
+		Tools.DownloadMongoDBCompass()
+	}
 	if database == "RedisInsight" {
-		Tools.StartRedisInsight();
+		Tools.StartRedisInsight()
 	} else {
 		startContainer(database)
 	}
