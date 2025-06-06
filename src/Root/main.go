@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -90,6 +89,23 @@ func startContainer(database string) {
 		restartFlag = "--restart unless-stopped"
 	}
 
+	// Ask for data persistence
+	volumePaths := map[string]string{
+		"mongodb":    "/data/db",
+		"redis":      "/data",
+		"mysql":      "/var/lib/mysql",
+		"postgresql": "/var/lib/postgresql/data",
+		"cassandra":  "/var/lib/cassandra",
+		"mariadb":    "/var/lib/mysql",
+	}
+	volumeMapping := ""
+	if Docker.AskYesNo("Do you want to persist data on host?") {
+		defaultHost := fmt.Sprintf("/var/lib/%s-data", database)
+		hostDir := askForInput("Enter host directory to persist data", defaultHost)
+		containerDir := volumePaths[database]
+		volumeMapping = fmt.Sprintf("-v %s:%s", hostDir, containerDir)
+	}
+
 	env := ""
 	if database == "mysql" || database == "postgresql" || database == "mariadb" {
 		fmt.Println("You need to set environment variables for the database.")
@@ -107,7 +123,10 @@ func startContainer(database string) {
 	}
 
 	containerName := fmt.Sprintf("%s-container", database)
-	runCmd := fmt.Sprintf("docker run -d --network ContainDB-Network %s %s %s --name %s %s", portMapping, restartFlag, env, containerName, image)
+	runCmd := fmt.Sprintf(
+		"docker run -d --network ContainDB-Network %s %s %s %s --name %s %s",
+		portMapping, restartFlag, volumeMapping, env, containerName, image,
+	)
 	fmt.Println("Running:", runCmd)
 	cmd = exec.Command("bash", "-c", runCmd)
 	cmd.Stdout = os.Stdout
@@ -146,11 +165,11 @@ func startContainer(database string) {
 }
 
 func main() {
-	// === handle Ctrl+C and rollback ===
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
-	defer stop()
+	// Replace Ctrl+C handler to avoid triggering on normal exit
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, os.Interrupt)
 	go func() {
-		<-ctx.Done()
+		<-sigCh
 		fmt.Println("\n⚠️ Interrupt received, rolling back...")
 		Tools.Cleanup()
 		os.Exit(1)
