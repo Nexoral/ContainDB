@@ -1,4 +1,4 @@
-package Tools
+package tools
 
 import (
 	"ContainDB/src/Docker"

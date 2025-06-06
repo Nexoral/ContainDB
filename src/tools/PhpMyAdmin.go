@@ -1,8 +1,8 @@
-package Tools
+package tools
 
 import (
-	"ContainDB/src/Docker"
 	"bufio"
+	"ContainDB/src/Docker"
 	"fmt"
 	"os"
 	"os/exec"

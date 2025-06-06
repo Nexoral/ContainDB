@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"os/signal"
 	"strings"
 
 	"ContainDB/src/Docker"
-	"ContainDB/src/Tools"
+	"ContainDB/src/tools"
 
 	"github.com/manifoldco/promptui"
 )
@@ -18,7 +19,11 @@ func selectDatabase() string {
 		Label: "Select the service to start",
 		Items: []string{"mongodb", "redis", "mysql", "postgresql", "cassandra", "mariadb", "phpmyadmin", "MongoDB Compass", "RedisInsight"},
 	}
-	_, result, _ := prompt.Run()
+	_, result, err := prompt.Run()
+	if err != nil {
+		fmt.Println("\n⚠️ Interrupt received, rolling back...")
+		tools.Cleanup() // perform cleanup and exit
+	}
 	return result
 }
 
@@ -84,6 +89,37 @@ func startContainer(database string) {
 		restartFlag = "--restart unless-stopped"
 	}
 
+	// Ask for data persistence
+	volumeMapping := ""
+	if Docker.AskYesNo("Do you want to persist data?") {
+		// map of container paths
+		containerDirs := map[string]string{
+			"mongodb":    "/data/db",
+			"redis":      "/data",
+			"mysql":      "/var/lib/mysql",
+			"postgresql": "/var/lib/postgresql/data",
+			"cassandra":  "/var/lib/cassandra",
+			"mariadb":    "/var/lib/mysql",
+		}
+		volName := fmt.Sprintf("%s-data", database)
+		// if already exists, ask reuse or recreate
+		if Docker.VolumeExists(volName) {
+			prompt := promptui.Select{
+				Label: fmt.Sprintf("Volume '%s' exists. Use or recreate?", volName),
+				Items: []string{"Use existing", "Create fresh"},
+			}
+			_, choice, _ := prompt.Run()
+			if choice == "Create fresh" {
+				fmt.Println("Removing and recreating volume:", volName)
+				_ = Docker.RemoveVolume(volName)
+				_ = Docker.CreateVolume(volName)
+			}
+		} else {
+			_ = Docker.CreateVolume(volName)
+		}
+		volumeMapping = fmt.Sprintf("-v %s:%s", volName, containerDirs[database])
+	}
+
 	env := ""
 	if database == "mysql" || database == "postgresql" || database == "mariadb" {
 		fmt.Println("You need to set environment variables for the database.")
@@ -101,7 +137,10 @@ func startContainer(database string) {
 	}
 
 	containerName := fmt.Sprintf("%s-container", database)
-	runCmd := fmt.Sprintf("docker run -d --network ContainDB-Network %s %s %s --name %s %s", portMapping, restartFlag, env, containerName, image)
+	runCmd := fmt.Sprintf(
+		"docker run -d --network ContainDB-Network %s %s %s %s --name %s %s",
+		portMapping, restartFlag, volumeMapping, env, containerName, image,
+	)
 	fmt.Println("Running:", runCmd)
 	cmd = exec.Command("bash", "-c", runCmd)
 	cmd.Stdout = os.Stdout
@@ -114,7 +153,7 @@ func startContainer(database string) {
 		if database == "mysql" || database == "postgresql" || database == "mariadb" {
 			consentPhpMyAdmin := Docker.AskYesNo("Do you want to install phpMyAdmin for this database?")
 			if consentPhpMyAdmin {
-				Tools.StartPHPMyAdmin()
+				tools.StartPHPMyAdmin()
 			} else {
 				fmt.Println("You can install phpMyAdmin later using the 'phpmyadmin' option.")
 			}
@@ -122,7 +161,7 @@ func startContainer(database string) {
 		if database == "mongodb" {
 			consentCompass := Docker.AskYesNo("Do you want to install MongoDB Compass?")
 			if consentCompass {
-				Tools.DownloadMongoDBCompass()
+				tools.DownloadMongoDBCompass()
 			} else {
 				fmt.Println("You can install MongoDB Compass later using the 'mongodb compass' option.")
 			}
@@ -131,7 +170,7 @@ func startContainer(database string) {
 		if database == "redis" {
 			consentRedisInsight := Docker.AskYesNo("Do you want to install Redis Insight?")
 			if consentRedisInsight {
-				Tools.StartRedisInsight()
+				tools.StartRedisInsight()
 			} else {
 				fmt.Println("You can install RedisInsight later using the 'redis insight' option.")
 			}
@@ -140,6 +179,16 @@ func startContainer(database string) {
 }
 
 func main() {
+	// Replace Ctrl+C handler to avoid triggering on normal exit
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, os.Interrupt)
+	go func() {
+		<-sigCh
+		fmt.Println("\n⚠️ Interrupt received, rolling back...")
+		tools.Cleanup()
+		os.Exit(1)
+	}()
+
 	// require sudo
 	if os.Geteuid() != 0 {
 		fmt.Println("❌ Please run this program with sudo")
@@ -161,16 +210,84 @@ func main() {
 		return
 	}
 
-	database := selectDatabase()
-	if database == "phpmyadmin" {
-		Tools.StartPHPMyAdmin()
+	// Add welcome banner
+	fmt.Println()
+	fmt.Println("+------------------------------------------+")
+	fmt.Println("|          Welcome to ContainDB CLI        |")
+	fmt.Println("+------------------------------------------+")
+	fmt.Println("|  A simple CLI to manage DB containers    |")
+	fmt.Println("|                                          |")
+	fmt.Println("|           Made by Ankan Saha             |")
+	fmt.Println("+------------------------------------------+")
+	fmt.Println()
+
+	// Top-level action menu
+	actionPrompt := promptui.Select{
+		Label: "What do you want to do?",
+		Items: []string{"Install Database", "List Databases", "Remove Database", "Exit"},
 	}
-	if database == "MongoDB Compass" {
-		Tools.DownloadMongoDBCompass()
+	_, action, err := actionPrompt.Run()
+	if err != nil {
+		fmt.Println("\n⚠️ Interrupt received, rolling back...")
+		tools.Cleanup()
+		return
 	}
-	if database == "RedisInsight" {
-		Tools.StartRedisInsight()
-	} else {
-		startContainer(database)
+
+	switch action {
+	case "Install Database":
+		database := selectDatabase()
+		if database == "phpmyadmin" {
+			tools.StartPHPMyAdmin()
+		} else if database == "MongoDB Compass" {
+			tools.DownloadMongoDBCompass()
+		} else if database == "RedisInsight" {
+			tools.StartRedisInsight()
+		} else {
+			startContainer(database)
+		}
+
+	case "List Databases":
+		names, err := Docker.ListRunningDatabases()
+		if err != nil {
+			fmt.Println("Error listing databases:", err)
+			return
+		}
+		if len(names) == 0 {
+			fmt.Println("No running databases found.")
+		} else {
+			fmt.Println("Running databases:")
+			for _, n := range names {
+				fmt.Println(" -", n)
+			}
+		}
+
+	case "Remove Database":
+		names, err := Docker.ListRunningDatabases()
+		if err != nil {
+			fmt.Println("Error listing databases:", err)
+			return
+		}
+		if len(names) == 0 {
+			fmt.Println("No running databases to remove.")
+		} else {
+			sel := promptui.Select{
+				Label: "Select database to remove",
+				Items: names,
+			}
+			_, name, cerr := sel.Run()
+			if cerr != nil {
+				fmt.Println("\n⚠️ Cancelled")
+				return
+			}
+			if err := Docker.RemoveDatabase(name); err != nil {
+				fmt.Println("Error removing database:", err)
+			} else {
+				fmt.Println("Database removed:", name)
+			}
+		}
+
+	case "Exit":
+		fmt.Println("Goodbye!")
+		return
 	}
 }
