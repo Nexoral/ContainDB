@@ -1,11 +1,12 @@
-package Tools;
+package Tools
 
 import (
+	"ContainDB/src/Docker"
 	"fmt"
 	"os"
 	"os/exec"
 	"strings"
-	"ContainDB/src/Docker"
+
 	"github.com/manifoldco/promptui"
 )
 
@@ -20,7 +21,11 @@ func StartRedisInsight() {
 		Label: "Select a Redis container to connect with RedisInsight",
 		Items: redisContainers,
 	}
-	_, selectedContainer, _ := prompt.Run()
+	_, selectedContainer, err := prompt.Run()
+	if err != nil {
+		fmt.Println("\n⚠️ Interrupt received, rolling back...")
+		Cleanup()
+	}
 
 	port := askForInput("Enter host port to expose RedisInsight", "5540")
 

@@ -2,6 +2,7 @@ package Docker
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
 	"strings"
 
@@ -13,7 +14,12 @@ func AskYesNo(label string) bool {
 		Label: label,
 		Items: []string{"Yes", "No"},
 	}
-	index, _, _ := prompt.Run()
+	index, _, err := prompt.Run()
+	if err != nil {
+		fmt.Println("\n⚠️ Interrupt received, rolling back...")
+		// Handle cleanup locally or call a function that doesn't create an import cycle
+		os.Exit(1)
+	}
 	return index == 0
 }
 

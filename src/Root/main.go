@@ -2,9 +2,11 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
+	"os/signal"
 	"strings"
 
 	"ContainDB/src/Docker"
@@ -18,7 +20,11 @@ func selectDatabase() string {
 		Label: "Select the service to start",
 		Items: []string{"mongodb", "redis", "mysql", "postgresql", "cassandra", "mariadb", "phpmyadmin", "MongoDB Compass", "RedisInsight"},
 	}
-	_, result, _ := prompt.Run()
+	_, result, err := prompt.Run()
+	if err != nil {
+		fmt.Println("\n⚠️ Interrupt received, rolling back...")
+		Tools.Cleanup() // perform cleanup and exit
+	}
 	return result
 }
 
@@ -140,6 +146,16 @@ func startContainer(database string) {
 }
 
 func main() {
+	// === handle Ctrl+C and rollback ===
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer stop()
+	go func() {
+		<-ctx.Done()
+		fmt.Println("\n⚠️ Interrupt received, rolling back...")
+		Tools.Cleanup()
+		os.Exit(1)
+	}()
+
 	// require sudo
 	if os.Geteuid() != 0 {
 		fmt.Println("❌ Please run this program with sudo")

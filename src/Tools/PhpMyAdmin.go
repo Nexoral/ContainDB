@@ -33,7 +33,11 @@ func StartPHPMyAdmin() {
 		Label: "Select a SQL container to link with phpMyAdmin",
 		Items: sqlContainers,
 	}
-	_, selectedContainer, _ := prompt.Run()
+	_, selectedContainer, err := prompt.Run()
+	if err != nil {
+		fmt.Println("\n⚠️ Interrupt received, rolling back...")
+		Cleanup()
+	}
 
 	port := askForInput("Enter host port to expose phpMyAdmin", "8080")
 
