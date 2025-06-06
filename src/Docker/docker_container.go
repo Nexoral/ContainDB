@@ -1,4 +1,4 @@
-package Docker;
+package Docker
 
 import (
 	"fmt"
@@ -53,4 +53,29 @@ func ListOfContainers(images []string) []string {
 		}
 	}
 	return containers
+}
+
+// VolumeExists returns true if Docker volume with given name exists
+func VolumeExists(name string) bool {
+	cmd := exec.Command("docker", "volume", "inspect", name)
+	if err := cmd.Run(); err != nil {
+		return false
+	}
+	return true
+}
+
+// CreateVolume creates a Docker volume with given name
+func CreateVolume(name string) error {
+	cmd := exec.Command("docker", "volume", "create", name)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
+}
+
+// RemoveVolume force-removes a Docker volume with given name
+func RemoveVolume(name string) error {
+	cmd := exec.Command("docker", "volume", "rm", "-f", name)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	return cmd.Run()
 }

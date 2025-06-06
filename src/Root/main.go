@@ -90,20 +90,34 @@ func startContainer(database string) {
 	}
 
 	// Ask for data persistence
-	volumePaths := map[string]string{
-		"mongodb":    "/data/db",
-		"redis":      "/data",
-		"mysql":      "/var/lib/mysql",
-		"postgresql": "/var/lib/postgresql/data",
-		"cassandra":  "/var/lib/cassandra",
-		"mariadb":    "/var/lib/mysql",
-	}
 	volumeMapping := ""
-	if Docker.AskYesNo("Do you want to persist data on host?") {
-		defaultHost := fmt.Sprintf("/var/lib/%s-data", database)
-		hostDir := askForInput("Enter host directory to persist data", defaultHost)
-		containerDir := volumePaths[database]
-		volumeMapping = fmt.Sprintf("-v %s:%s", hostDir, containerDir)
+	if Docker.AskYesNo("Do you want to persist data?") {
+		// map of container paths
+		containerDirs := map[string]string{
+			"mongodb":    "/data/db",
+			"redis":      "/data",
+			"mysql":      "/var/lib/mysql",
+			"postgresql": "/var/lib/postgresql/data",
+			"cassandra":  "/var/lib/cassandra",
+			"mariadb":    "/var/lib/mysql",
+		}
+		volName := fmt.Sprintf("%s-data", database)
+		// if already exists, ask reuse or recreate
+		if Docker.VolumeExists(volName) {
+			prompt := promptui.Select{
+				Label: fmt.Sprintf("Volume '%s' exists. Use or recreate?", volName),
+				Items: []string{"Use existing", "Create fresh"},
+			}
+			_, choice, _ := prompt.Run()
+			if choice == "Create fresh" {
+				fmt.Println("Removing and recreating volume:", volName)
+				_ = Docker.RemoveVolume(volName)
+				_ = Docker.CreateVolume(volName)
+			}
+		} else {
+			_ = Docker.CreateVolume(volName)
+		}
+		volumeMapping = fmt.Sprintf("-v %s:%s", volName, containerDirs[database])
 	}
 
 	env := ""
@@ -196,16 +210,84 @@ func main() {
 		return
 	}
 
-	database := selectDatabase()
-	if database == "phpmyadmin" {
-		tools.StartPHPMyAdmin()
+	// Add welcome banner
+	fmt.Println()
+	fmt.Println("+------------------------------------------+")
+	fmt.Println("|          Welcome to ContainDB CLI        |")
+	fmt.Println("+------------------------------------------+")
+	fmt.Println("|  A simple CLI to manage DB containers    |")
+	fmt.Println("|                                          |")
+	fmt.Println("|           Made by Ankan Saha             |")
+	fmt.Println("+------------------------------------------+")
+	fmt.Println()
+
+	// Top-level action menu
+	actionPrompt := promptui.Select{
+		Label: "What do you want to do?",
+		Items: []string{"Install Database", "List Databases", "Remove Database", "Exit"},
 	}
-	if database == "MongoDB Compass" {
-		tools.DownloadMongoDBCompass()
+	_, action, err := actionPrompt.Run()
+	if err != nil {
+		fmt.Println("\n⚠️ Interrupt received, rolling back...")
+		tools.Cleanup()
+		return
 	}
-	if database == "RedisInsight" {
-		tools.StartRedisInsight()
-	} else {
-		startContainer(database)
+
+	switch action {
+	case "Install Database":
+		database := selectDatabase()
+		if database == "phpmyadmin" {
+			tools.StartPHPMyAdmin()
+		} else if database == "MongoDB Compass" {
+			tools.DownloadMongoDBCompass()
+		} else if database == "RedisInsight" {
+			tools.StartRedisInsight()
+		} else {
+			startContainer(database)
+		}
+
+	case "List Databases":
+		names, err := Docker.ListRunningDatabases()
+		if err != nil {
+			fmt.Println("Error listing databases:", err)
+			return
+		}
+		if len(names) == 0 {
+			fmt.Println("No running databases found.")
+		} else {
+			fmt.Println("Running databases:")
+			for _, n := range names {
+				fmt.Println(" -", n)
+			}
+		}
+
+	case "Remove Database":
+		names, err := Docker.ListRunningDatabases()
+		if err != nil {
+			fmt.Println("Error listing databases:", err)
+			return
+		}
+		if len(names) == 0 {
+			fmt.Println("No running databases to remove.")
+		} else {
+			sel := promptui.Select{
+				Label: "Select database to remove",
+				Items: names,
+			}
+			_, name, cerr := sel.Run()
+			if cerr != nil {
+				fmt.Println("\n⚠️ Cancelled")
+				return
+			}
+			if err := Docker.RemoveDatabase(name); err != nil {
+				fmt.Println("Error removing database:", err)
+			} else {
+				fmt.Println("Database removed:", name)
+			}
+		}
+
+	case "Exit":
+		fmt.Println("Goodbye!")
+		return
 	}
 }
