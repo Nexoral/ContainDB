@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"ContainDB/src/Docker"
-	"ContainDB/src/Tools"
+	"ContainDB/src/tools"
 
 	"github.com/manifoldco/promptui"
 )
@@ -22,7 +22,7 @@ func selectDatabase() string {
 	_, result, err := prompt.Run()
 	if err != nil {
 		fmt.Println("\n⚠️ Interrupt received, rolling back...")
-		Tools.Cleanup() // perform cleanup and exit
+		tools.Cleanup() // perform cleanup and exit
 	}
 	return result
 }
@@ -139,7 +139,7 @@ func startContainer(database string) {
 		if database == "mysql" || database == "postgresql" || database == "mariadb" {
 			consentPhpMyAdmin := Docker.AskYesNo("Do you want to install phpMyAdmin for this database?")
 			if consentPhpMyAdmin {
-				Tools.StartPHPMyAdmin()
+				tools.StartPHPMyAdmin()
 			} else {
 				fmt.Println("You can install phpMyAdmin later using the 'phpmyadmin' option.")
 			}
@@ -147,7 +147,7 @@ func startContainer(database string) {
 		if database == "mongodb" {
 			consentCompass := Docker.AskYesNo("Do you want to install MongoDB Compass?")
 			if consentCompass {
-				Tools.DownloadMongoDBCompass()
+				tools.DownloadMongoDBCompass()
 			} else {
 				fmt.Println("You can install MongoDB Compass later using the 'mongodb compass' option.")
 			}
@@ -156,7 +156,7 @@ func startContainer(database string) {
 		if database == "redis" {
 			consentRedisInsight := Docker.AskYesNo("Do you want to install Redis Insight?")
 			if consentRedisInsight {
-				Tools.StartRedisInsight()
+				tools.StartRedisInsight()
 			} else {
 				fmt.Println("You can install RedisInsight later using the 'redis insight' option.")
 			}
@@ -171,7 +171,7 @@ func main() {
 	go func() {
 		<-sigCh
 		fmt.Println("\n⚠️ Interrupt received, rolling back...")
-		Tools.Cleanup()
+		tools.Cleanup()
 		os.Exit(1)
 	}()
 
@@ -198,13 +198,13 @@ func main() {
 
 	database := selectDatabase()
 	if database == "phpmyadmin" {
-		Tools.StartPHPMyAdmin()
+		tools.StartPHPMyAdmin()
 	}
 	if database == "MongoDB Compass" {
-		Tools.DownloadMongoDBCompass()
+		tools.DownloadMongoDBCompass()
 	}
 	if database == "RedisInsight" {
-		Tools.StartRedisInsight()
+		tools.StartRedisInsight()
 	} else {
 		startContainer(database)
 	}

@@ -1,6 +1,6 @@
 module ContainDB
 
-go 1.24
+go 1.20
 
 require github.com/manifoldco/promptui v0.9.0
 
