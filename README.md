@@ -1,64 +1,143 @@
 # ContainDB
 
-ContainDB is a Go-based CLI tool that automates the installation and management of popular database containers (MongoDB, Redis, MySQL, PostgreSQL, Cassandra) and PHPMyAdmin.  
+ContainDB is a CLI tool written in Go that automates the installation and management of popular database containers (MongoDB, Redis, MySQL, PostgreSQL, Cassandra) as well as PHPMyAdmin and MongoDB Compass. It handles Docker installation (if missing), network setup, container orchestration, optional port mapping, restart policies, and data persistence.
 
-ContainDB was born out of frustration: installing MongoDB and other databases on Linux can be cumbersome. This package streamlines the process by providing a pre-built `.deb` installer. Simply download our `.deb` file from the [Releases](https://github.com/yourusername/ContainDB/releases) section, install it, and start using `containDB` to manage your database containers effortlessly.
+---
 
 ## Features
 
-- Automatically installs Docker if missing.
-- Creates a custom Docker network (`ContainDB-Network`).
-- Interactive prompts for selecting databases or PHPMyAdmin.
-- Pulls required Docker images and runs containers with optional:
-  - Custom or default port mappings.
-  - Auto-restart policies.
-  - Environment variables for root credentials.
-- Links PHPMyAdmin to an existing MySQL/PostgreSQL container.
+- ✅ Automatic Docker installation and setup  
+- 🌐 Dedicated Docker network (`ContainDB-Network`) for seamless inter-container communication  
+- 📦 Pulls and runs database images with sensible defaults  
+- 🔌 Interactive prompts for:
+  - Port mapping (default or custom)
+  - Auto-restart policies
+  - Environment variables for credentials
+  - Volume persistence and management
+- 🔗 One-click PHPMyAdmin linking to existing SQL containers  
+- 🧭 Optional MongoDB Compass download and install  
+
+---
 
 ## Prerequisites
 
-- A Unix-like OS with Bash.
-- Internet connection for downloading images.
+- Linux or macOS (with Bash)  
+- Internet connection to download Docker images  
+
+---
 
 ## Installation
 
-Download the latest `.deb` package from the [Releases](https://github.com/yourusername/ContainDB/releases) page:
-
+Option 1: Download and install via Debian package  
 ```bash
-wget https://github.com/AnkanSaha/ContainDB/releases/download/vX.Y.Z/containDB_X.Y.Z_amd64.deb
-sudo dpkg -i containDB_X.Y.Z_amd64.deb
+# download latest .deb from Releases
+wget https://github.com/AnkanSaha/ContainDB/releases/download/v3.10.13-stable/containDB_3.10.13-stable_amd64.deb
+
+# install the package
+sudo dpkg -i containDB_3.10.13-stable_amd64.deb
 ```
 
-## Usage
-
+Option 2: Build from source  
 ```bash
-# Run the tool
+# clone the repository
+git clone https://github.com/AnkanSaha/ContainDB.git
+cd ContainDB
+
+# build the CLI
+./Scripts/BinBuilder.sh
+
+# install binary to /usr/local/bin
+sudo mv ./bin/containDB /usr/local/bin/
+```
+
+---
+
+## Quick Start
+
+Run the CLI with root privileges:
+```bash
 sudo containDB
 ```
+1. **Welcome Banner** – Displays version and basic info.  
+2. **Main Menu** – Choose one of:
+   - Install Database  
+   - List Databases  
+   - Remove Database  
+   - Exit  
+3. **Follow Prompts** – Configure and launch containers in a few keystrokes.
 
-- Select a service from the menu.
-- Follow prompts to configure ports, credentials, and restart policies.
-- For PHPMyAdmin, select an existing SQL container and expose it on a host port.
+---
 
-## How It Works
+## Usage Examples
 
-1. **Docker Check & Install**  
-   Uses `installation` package to verify Docker; installs if absent.
+### 1. Install a Database
+```bash
+sudo containDB
+# Select "Install Database"
+# Pick "mysql" (or any supported service)
+# Answer port mapping, restart policy, persistence, credentials
+```
 
-2. **Network Setup**  
-   Ensures a Docker network `ContainDB-Network` exists for inter-container communication.
+### 2. Launch PHPMyAdmin
+```bash
+sudo containDB
+# Select "Install Database"
+# Choose "phpmyadmin"
+# Pick an existing SQL container and assign host port
+```
 
-3. **Interactive Selection**  
-   Leverages `promptui` for a user-friendly menu to choose a service.
+### 3. Install MongoDB Compass
+```bash
+sudo containDB
+# Select "Install Database"
+# Choose "MongoDB Compass"
+```
 
-4. **Image Pull & Run**  
-   - Pulls the selected database image (or PHPMyAdmin).  
-   - Queries user for port mapping and restart policy.  
-   - Builds and executes a `docker run` command with the chosen options.
+### 4. List Running Containers
+```bash
+sudo containDB --version
+sudo containDB
+# Select "List Databases"
+```
 
-5. **PHPMyAdmin Linking**  
-   - Detects running MySQL/PostgreSQL containers.  
-   - Prompts for which container to link.  
-   - Runs PHPMyAdmin on the same network, pointing `PMA_HOST` to the selected container.
+### 5. Remove a Database
+```bash
+sudo containDB
+# Select "Remove Database"
+# Pick the container to delete (with optional volume cleanup)
+```
 
-Enjoy seamless container setups with ContainDB!
+---
+
+## Flags
+
+- `--version` : Print ContainDB CLI version and exit.
+
+---
+
+## Troubleshooting
+
+- **Permission Denied**  
+  Ensure you run with `sudo`.  
+- **Docker Not Found**  
+  The CLI auto-installs Docker on first run; please restart your terminal after installation.  
+- **Port Already in Use**  
+  Choose a different host port when prompted.  
+- **Volume Conflicts**  
+  On existing volumes, you can opt to reuse or recreate fresh ones.  
+
+---
+
+## Contributing
+
+1. Fork the repo  
+2. Create your feature branch (`git checkout -b feature/…`)  
+3. Commit your changes (`git commit -m 'Add …'`)  
+4. Push to the branch (`git push origin feature/…`)  
+5. Open a Pull Request  
+
+---
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.

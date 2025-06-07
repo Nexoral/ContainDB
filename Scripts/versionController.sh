@@ -109,3 +109,10 @@ banner_go="$(dirname "$0")/../src/Root/Banner.go"
 sed -i "s|^\([[:space:]]*\)const Version =.*|\1const Version = \"${new_version}-${suffix}\"|" "$banner_go"
 
 echo "Updated main.go and Banner.go with new version."
+
+# Update version in README.md installation URLs
+readme_file="$(dirname "$0")/../README.md"
+sed -i "s|^\(\s*wget .*/releases/download/v\)[^/]*\(/containDB_\)[^_]*\(_amd64\.deb\)|\1${new_version}-${suffix}\2${new_version}-${suffix}\3|" "$readme_file"
+sed -i "s|^\(\s*sudo dpkg -i containDB_\)[^_]*\(_amd64\.deb\)|\1${new_version}-${suffix}\2|" "$readme_file"
+
+echo "Updated README.md with new version in installation URLs."
