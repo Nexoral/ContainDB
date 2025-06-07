@@ -31,10 +31,10 @@ ContainDB is a CLI tool written in Go that automates the installation and manage
 Option 1: Download and install via Debian package  
 ```bash
 # download latest .deb from Releases
-wget https://github.com/AnkanSaha/ContainDB/releases/download/v3.10.13-stable/containDB_3.10.13-stable_amd64.deb
+wget https://github.com/AnkanSaha/ContainDB/releases/download/v3.10.14-stable/containDB_3.10.14-stable_amd64.deb
 
 # install the package
-sudo dpkg -i containDB_3.10.13-stable_amd64.deb
+sudo dpkg -i containDB_3.10.14-stable_amd64.deb
 ```
 
 Option 2: Build from source  
