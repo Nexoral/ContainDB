@@ -186,6 +186,9 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Show welcome banner
+	ShowBanner();
+
 	if !Docker.IsDockerInstalled() {
 		err := Docker.InstallDocker()
 		if err != nil {
@@ -201,16 +204,7 @@ func main() {
 		return
 	}
 
-	// Add welcome banner
-	fmt.Println()
-	fmt.Println("+------------------------------------------+")
-	fmt.Println("|          Welcome to ContainDB CLI        |")
-	fmt.Println("+------------------------------------------+")
-	fmt.Println("|  A simple CLI to manage DB containers    |")
-	fmt.Println("|                                          |")
-	fmt.Println("|           Made by Ankan Saha             |")
-	fmt.Println("+------------------------------------------+")
-	fmt.Println()
+
 
 	// Top-level action menu
 	actionPrompt := promptui.Select{
