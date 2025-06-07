@@ -81,3 +81,17 @@ gh release create "$TAG" "${DEB_FILES[@]}" \
 $COMMIT_MSG"
 
 echo "✅ GitHub release published with .deb assets"
+
+# --- Cleanup old releases, keep only latest two ---
+echo "🗑️ Cleaning up old releases, retaining only latest two"
+release_tags=($(gh release list --limit 1000 --json tagName,createdAt \
+  --jq 'sort_by(.createdAt) | reverse | .[].tagName'))
+if [ ${#release_tags[@]} -gt 2 ]; then
+  for ((i = 2; i < ${#release_tags[@]}; i++)); do
+    old_tag=${release_tags[i]}
+    echo "🗑️ Deleting release $old_tag"
+    gh release delete "$old_tag" --yes
+    echo "🗑️ Deleting git tag $old_tag"
+    git push origin --delete "$old_tag"
+  done
+fi
