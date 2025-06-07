@@ -2,8 +2,9 @@ package main
 
 import "fmt"
 
+const Version = "3.9.13-stable"
+
 func ShowBanner() {
-	VERSION := "1.0.0"
 	banner := `
  __      __  ______   __         ______    ______   __       __  ______  
 /\ \    /\ \/\  ___\ /\ \       /\  ___\  /\  __ \ /\ \     /\ \/\  ___\ 
@@ -17,7 +18,7 @@ func ShowBanner() {
 	fmt.Println()
 	fmt.Println("+------------------------------------------+")
 	fmt.Println("|          Welcome to ContainDB CLI        |")
-	fmt.Printf("|               Version: %-18s|\n", VERSION)
+	fmt.Printf("|               Version: %-18s|\n", Version)
 	fmt.Println("+------------------------------------------+")
 	fmt.Println("|  A simple CLI to manage DB containers    |")
 	fmt.Println("|                                          |")

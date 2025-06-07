@@ -99,5 +99,13 @@ fi
 # Update local version file
 suffix=$(echo "$version_type" | tr '[:upper:]' '[:lower:]')
 echo "${new_version}-${suffix}" >"$(dirname "$0")/../VERSION"
-
 echo "Local version updated to ${new_version}-${suffix}"
+
+# Update static version in main.go and Banner.go
+main_go="$(dirname "$0")/../src/Root/main.go"
+sed -i "s|^\([[:space:]]*\)VERSION :=.*|\1VERSION := \"${new_version}-${suffix}\"|" "$main_go"
+
+banner_go="$(dirname "$0")/../src/Root/Banner.go"
+sed -i "s|^\([[:space:]]*\)const Version =.*|\1const Version = \"${new_version}-${suffix}\"|" "$banner_go"
+
+echo "Updated main.go and Banner.go with new version."
