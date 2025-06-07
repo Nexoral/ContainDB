@@ -17,7 +17,7 @@ import (
 func selectDatabase() string {
 	prompt := promptui.Select{
 		Label: "Select the service to start",
-		Items: []string{"mongodb", "redis", "mysql", "postgresql", "cassandra", "mariadb", "phpmyadmin", "MongoDB Compass", "RedisInsight"},
+		Items: []string{"mongodb", "redis", "mysql", "postgresql", "cassandra", "mariadb", "phpmyadmin", "MongoDB Compass"},
 	}
 	_, result, err := prompt.Run()
 	if err != nil {
@@ -166,15 +166,6 @@ func startContainer(database string) {
 				fmt.Println("You can install MongoDB Compass later using the 'mongodb compass' option.")
 			}
 		}
-
-		if database == "redis" {
-			consentRedisInsight := Docker.AskYesNo("Do you want to install Redis Insight?")
-			if consentRedisInsight {
-				tools.StartRedisInsight()
-			} else {
-				fmt.Println("You can install RedisInsight later using the 'redis insight' option.")
-			}
-		}
 	}
 }
 
@@ -240,8 +231,6 @@ func main() {
 			tools.StartPHPMyAdmin()
 		} else if database == "MongoDB Compass" {
 			tools.DownloadMongoDBCompass()
-		} else if database == "RedisInsight" {
-			tools.StartRedisInsight()
 		} else {
 			startContainer(database)
 		}
