@@ -1,4 +1,4 @@
-package main;
+package main
 
 import (
 	"fmt"
@@ -37,12 +37,23 @@ func main() {
 	}
 
 	if !Docker.IsDockerInstalled() {
-		err := Docker.InstallDocker()
+		fmt.Println("❌ Docker is not installed. Without Docker the tool cannot run.")
+		installPrompt := promptui.Select{
+			Label: "Would you like to install Docker now?",
+			Items: []string{"Yes", "No"},
+		}
+		_, choice, err := installPrompt.Run()
+		if err != nil || choice == "No" {
+			fmt.Println("Exiting. Please install Docker manually and rerun.")
+			os.Exit(1)
+		}
+		err = Docker.InstallDocker()
 		if err != nil {
 			fmt.Println("Failed to install Docker:", err)
 			return
 		}
 		fmt.Println("Docker installed successfully! Please restart the terminal or log out & log in again.")
+		return
 	}
 
 	err := Docker.CreateDockerNetworkIfNotExists()
