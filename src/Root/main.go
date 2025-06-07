@@ -1,4 +1,4 @@
-package main
+package main;
 
 import (
 	"fmt"
@@ -11,10 +11,15 @@ import (
 	"github.com/manifoldco/promptui"
 )
 
-
-
-
 func main() {
+	VERSION := "2.9.13-stable"
+
+	// handle version flag without requiring sudo
+	if len(os.Args) > 1 && os.Args[1] == "--version" {
+		fmt.Println("ContainDB CLI Version:", VERSION)
+		return
+	}
+
 	// Replace Ctrl+C handler to avoid triggering on normal exit
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, os.Interrupt)
