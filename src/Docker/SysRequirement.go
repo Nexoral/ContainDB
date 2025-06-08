@@ -38,7 +38,7 @@ func checkDockerInstallation() error {
 	cmd := exec.Command("docker", "--version")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("Docker is not installed or not accessible: %v", err)
+		return fmt.Errorf("docker is not installed or not accessible: %v", err)
 	}
 	
 	fmt.Printf("Docker is available: %s\n", strings.TrimSpace(string(output)))
