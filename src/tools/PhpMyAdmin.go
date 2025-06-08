@@ -2,25 +2,12 @@ package tools
 
 import (
 	"ContainDB/src/Docker"
-	"bufio"
 	"fmt"
 	"os"
 	"os/exec"
-	"strings"
 
 	"github.com/manifoldco/promptui"
 )
-
-func askForInput(label, defaultValue string) string {
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Printf("%s [%s]: ", label, defaultValue)
-	input, _ := reader.ReadString('\n')
-	input = strings.TrimSpace(input)
-	if input == "" {
-		return defaultValue
-	}
-	return input
-}
 
 func StartPHPMyAdmin() {
 	sqlContainers := Docker.ListOfContainers([]string{"mysql", "postgres", "mariadb"})
@@ -44,7 +31,7 @@ func StartPHPMyAdmin() {
 		return
 	}
 
-	port := askForInput("Enter host port to expose phpMyAdmin", "8080")
+	port := AskForInput("Enter host port to expose phpMyAdmin", "8080")
 
 	fmt.Printf("Pulling phpMyAdmin image...\n")
 	cmd := exec.Command("docker", "pull", "phpmyadmin/phpmyadmin")
