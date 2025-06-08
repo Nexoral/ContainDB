@@ -49,7 +49,7 @@ func StartContainer(database string) {
 	if Docker.AskYesNo("Do you want to map container port with host?") {
 		customPort := Docker.AskYesNo("Do you want to use custom host port?")
 		if customPort {
-			hostPort := AskForInput("Enter custom host port", port)
+			hostPort := tools.AskForInput("Enter custom host port", port)
 			portMapping = fmt.Sprintf("-p %s:%s", hostPort, port)
 		} else {
 			portMapping = fmt.Sprintf("-p %s:%s", port, port)
@@ -100,8 +100,8 @@ func StartContainer(database string) {
 	env := ""
 	if database == "mysql" || database == "postgresql" || database == "mariadb" {
 		fmt.Println("You need to set environment variables for the database.")
-		user := AskForInput("Enter root username", "root")
-		pass := AskForInput("Enter root password", "password")
+		user := tools.AskForInput("Enter root username", "root")
+		pass := tools.AskForInput("Enter root password", "password")
 
 		if database == "mysql" {
 			env = fmt.Sprintf("-e MYSQL_ROOT_PASSWORD=%s", pass)
