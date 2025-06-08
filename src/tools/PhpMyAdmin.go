@@ -1,8 +1,8 @@
 package tools
 
 import (
-	"bufio"
 	"ContainDB/src/Docker"
+	"bufio"
 	"fmt"
 	"os"
 	"os/exec"
@@ -29,14 +29,19 @@ func StartPHPMyAdmin() {
 		return
 	}
 
+	items := append(sqlContainers, "Exit")
 	prompt := promptui.Select{
 		Label: "Select a SQL container to link with phpMyAdmin",
-		Items: sqlContainers,
+		Items: items,
 	}
 	_, selectedContainer, err := prompt.Run()
 	if err != nil {
 		fmt.Println("\n⚠️ Interrupt received, rolling back...")
 		Cleanup()
+	}
+	if selectedContainer == "Exit" {
+		fmt.Println("Exiting phpMyAdmin setup.")
+		return
 	}
 
 	port := askForInput("Enter host port to expose phpMyAdmin", "8080")

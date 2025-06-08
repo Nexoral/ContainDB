@@ -76,15 +76,20 @@ func StartContainer(database string) {
 		volName := fmt.Sprintf("%s-data", database)
 		// if already exists, ask reuse or recreate
 		if Docker.VolumeExists(volName) {
+			items := []string{"Use existing", "Create fresh", "Exit"}
 			prompt := promptui.Select{
 				Label: fmt.Sprintf("Volume '%s' exists. Use or recreate?", volName),
-				Items: []string{"Use existing", "Create fresh"},
+				Items: items,
 			}
 			_, choice, _ := prompt.Run()
 			if choice == "Create fresh" {
 				fmt.Println("Removing and recreating volume:", volName)
 				_ = Docker.RemoveVolume(volName)
 				_ = Docker.CreateVolume(volName)
+			}
+			if choice == "Exit" {
+				fmt.Println("Exiting setup.")
+				return
 			}
 		} else {
 			_ = Docker.CreateVolume(volName)

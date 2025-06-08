@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	VERSION := "3.10.15-stable"
+	VERSION := "3.11.15-stable"
 
 	// handle version flag without requiring sudo
 	if len(os.Args) > 1 && os.Args[1] == "--version" {
@@ -40,15 +40,15 @@ func main() {
 		fmt.Println("❌ Docker is not installed. Without Docker the tool cannot run.")
 		installPrompt := promptui.Select{
 			Label: "Would you like to install Docker now?",
-			Items: []string{"Yes", "No"},
+			Items: []string{"Yes", "No", "Exit"},
 		}
 		_, choice, err := installPrompt.Run()
-		if err != nil || choice == "No" {
+		if err != nil || choice != "Yes" {
 			fmt.Println("Exiting. Please install Docker manually and rerun.")
 			os.Exit(1)
 		}
 		fmt.Println(("Checking system requirements..."))
-		Docker.CheckSystemRequirements(); // Check system requirements before installing Docker
+		Docker.CheckSystemRequirements() // Check system requirements before installing Docker
 		err = Docker.InstallDocker()
 		if err != nil {
 			fmt.Println("Failed to install Docker:", err)
@@ -114,12 +114,13 @@ func main() {
 		if len(names) == 0 {
 			fmt.Println("No running databases to remove.")
 		} else {
+			items := append(names, "Exit")
 			sel := promptui.Select{
 				Label: "Select database to remove",
-				Items: names,
+				Items: items,
 			}
 			_, name, cerr := sel.Run()
-			if cerr != nil {
+			if cerr != nil || name == "Exit" {
 				fmt.Println("\n⚠️ Cancelled")
 				return
 			}
