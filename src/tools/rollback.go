@@ -9,13 +9,16 @@ import (
 // Cleanup stops and removes any created containers and temporary artifacts.
 func Cleanup() {
 	fmt.Println("🧹 Cleaning up resources...")
-
-	// stop & remove all containers named "*-container"
-	exec.Command("bash", "-c", "docker rm -f $(docker ps -a --filter \"name=-container\" -q)").Run()
-
-	// remove phpMyAdmin and RedisInsight containers if present
-	exec.Command("docker", "rm", "-f", "phpmyadmin").Run()
-	exec.Command("docker", "rm", "-f", "redisinsight").Run()
+	
+	// remove exited/dead containers
+	fmt.Println("- Removing failed containers...")
+	exec.Command("bash", "-c", "docker rm -f $(docker ps -a --filter \"status=exited\" -q)").Run()
+	exec.Command("bash", "-c", "docker rm -f $(docker ps -a --filter \"status=dead\" -q)").Run()
+	exec.Command("bash", "-c", "docker rm -f $(docker ps -a --filter \"status=created\" -q)").Run()
+	
+	// remove dangling images
+	fmt.Println("- Removing dangling images...")
+	exec.Command("bash", "-c", "docker image prune -f").Run()
 
 	// clean up MongoDB Compass download
 	os.Remove("/tmp/mongodb-compass.deb")

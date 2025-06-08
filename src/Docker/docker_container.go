@@ -1,4 +1,4 @@
-package Docker;
+package Docker
 
 import (
 	"fmt"
@@ -10,15 +10,20 @@ import (
 )
 
 func AskYesNo(label string) bool {
+	items := []string{"Yes", "No", "Exit"}
 	prompt := promptui.Select{
 		Label: label,
-		Items: []string{"Yes", "No"},
+		Items: items,
 	}
 	index, _, err := prompt.Run()
 	if err != nil {
 		fmt.Println("\n⚠️ Interrupt received, rolling back...")
 		// Handle cleanup locally or call a function that doesn't create an import cycle
 		os.Exit(1)
+	}
+	if index == len(items)-1 {
+		fmt.Println("Exiting...")
+		os.Exit(0)
 	}
 	return index == 0
 }
