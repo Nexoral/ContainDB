@@ -1,12 +1,11 @@
 package main
 
 import (
+	"ContainDB/src/Docker"
+	"ContainDB/src/tools"
 	"fmt"
 	"os"
 	"os/signal"
-
-	"ContainDB/src/Docker"
-	"ContainDB/src/tools"
 
 	"github.com/manifoldco/promptui"
 )

@@ -9,13 +9,13 @@ import (
 // Cleanup stops and removes any created containers and temporary artifacts.
 func Cleanup() {
 	fmt.Println("🧹 Cleaning up resources...")
-	
+
 	// remove exited/dead containers
 	fmt.Println("- Removing failed containers...")
 	exec.Command("bash", "-c", "docker rm -f $(docker ps -a --filter \"status=exited\" -q)").Run()
 	exec.Command("bash", "-c", "docker rm -f $(docker ps -a --filter \"status=dead\" -q)").Run()
 	exec.Command("bash", "-c", "docker rm -f $(docker ps -a --filter \"status=created\" -q)").Run()
-	
+
 	// remove dangling images
 	fmt.Println("- Removing dangling images...")
 	exec.Command("bash", "-c", "docker image prune -f").Run()
