@@ -59,4 +59,4 @@ func UninstallDocker() error {
 		}
 	}
 	return nil
-};
+}
