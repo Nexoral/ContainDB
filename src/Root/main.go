@@ -18,6 +18,13 @@ func main() {
 	if len(os.Args) > 1 && os.Args[1] == "--version" {
 		fmt.Println("ContainDB CLI Version:", VERSION)
 		return
+	} else if len(os.Args) > 1 && os.Args[1] == "--help" {
+		fmt.Println("ContainDB CLI - A tool for managing Docker databases")
+		fmt.Println("Usage: sudo containdb")
+		fmt.Println("Options:")
+		fmt.Println("  --version   Show version information")
+		fmt.Println("  --help             Show this help message")
+		return
 	}
 
 	// Replace Ctrl+C handler to avoid triggering on normal exit
