@@ -11,20 +11,14 @@ import (
 )
 
 func main() {
-	const VERSION = "3.11.16-stable"
-
-	// handle version flag without requiring sudo
-	if len(os.Args) > 1 && os.Args[1] == "--version" {
-		fmt.Println("ContainDB CLI Version:", VERSION)
-		return
-	} else if len(os.Args) > 1 && os.Args[1] == "--help" {
-		fmt.Println("ContainDB CLI - A tool for managing Docker databases")
-		fmt.Println("Usage: sudo containdb")
-		fmt.Println("Options:")
-		fmt.Println("  --version   Show version information")
-		fmt.Println("  --help             Show this help message")
-		return
+	// require sudo
+	if os.Geteuid() != 0 {
+		fmt.Println("❌ Please run this program with sudo")
+		os.Exit(1)
 	}
+
+	// toggle flag handler
+	flagHandler()
 
 	// Replace Ctrl+C handler to avoid triggering on normal exit
 	sigCh := make(chan os.Signal, 1)
@@ -35,12 +29,6 @@ func main() {
 		tools.Cleanup()
 		os.Exit(1)
 	}()
-
-	// require sudo
-	if os.Geteuid() != 0 {
-		fmt.Println("❌ Please run this program with sudo")
-		os.Exit(1)
-	}
 
 	if !Docker.IsDockerInstalled() {
 		fmt.Println("❌ Docker is not installed. Without Docker the tool cannot run.")
