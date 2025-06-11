@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	VERSION := "3.11.16-stable"
+	const VERSION = "3.11.16-stable";
 
 	// handle version flag without requiring sudo
 	if len(os.Args) > 1 && os.Args[1] == "--version" {
