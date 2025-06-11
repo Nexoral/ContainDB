@@ -1,4 +1,4 @@
-package Docker;
+package Docker
 
 import (
 	"fmt"
@@ -14,7 +14,7 @@ func IsDockerInstalled() bool {
 
 func InstallDocker() error {
 	fmt.Println("Docker not found. Installing Docker...")
-	commands := []string {
+	commands := []string{
 		"sudo apt-get update",
 		"sudo apt-get install -y ca-certificates curl",
 		"sudo install -m 0755 -d /etc/apt/keyrings",
