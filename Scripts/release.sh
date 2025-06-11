@@ -8,12 +8,6 @@ ARCH="amd64"
 VERSION_FILE="./VERSION"
 VERSION=$(cat "$VERSION_FILE" | tr -d '[:space:]')
 
-# ensure only stable versions are published
-if [[ "$VERSION" != *-stable ]]; then
-  echo "❌ Stable version required to publish release. Current version: $VERSION"
-  exit 0
-fi
-
 # === Build steps ===
 ./Scripts/BinBuilder.sh
 echo "🔨 Binary Building completed of $APP_NAME version $VERSION for $ARCH"
