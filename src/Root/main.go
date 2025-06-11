@@ -10,6 +10,7 @@ import (
 	"github.com/manifoldco/promptui"
 )
 
+
 func main() {
 	// require sudo
 	if os.Geteuid() != 0 {

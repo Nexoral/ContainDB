@@ -8,7 +8,7 @@ import (
 
 // flagHandler handles command line flags for the ContainDB CLI
 func flagHandler() {
-	VERSION := "3.11.17-beta"
+	VERSION := "3.11.18-stable"
 	// handle version flag without requiring sudo
 	if len(os.Args) > 1 && os.Args[1] == "--version" {
 		fmt.Println("ContainDB CLI Version:", VERSION)
