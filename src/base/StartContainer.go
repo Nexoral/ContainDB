@@ -103,12 +103,23 @@ func StartContainer(database string) {
 		user := tools.AskForInput("Enter Core username", "root")
 		pass := tools.AskForInput("Enter Core password", "password")
 
+		// check if user is empty, if so, set to root
+		if user == "" {
+			user = "root"
+		}
+
+		// check if pass is empty, if so, set to password
+		if pass == "" {
+			fmt.Println("Error: Password cannot be empty. Please provide a valid password.")
+			os.Exit(1);
+		}
+
 		if database == "mysql" {
-			env = fmt.Sprintf("-e MYSQL_Core_PASSWORD=%s", pass)
+			env = fmt.Sprintf("-e MYSQL_ROOT_PASSWORD=%s", pass)
 		} else if database == "postgresql" {
 			env = fmt.Sprintf("-e POSTGRES_PASSWORD=%s -e POSTGRES_USER=%s", pass, user)
 		} else if database == "mariadb" {
-			env = fmt.Sprintf("-e MARIADB_Core_PASSWORD=%s", pass)
+			env = fmt.Sprintf("-e MARIADB_ROOT_PASSWORD=%s", pass)
 		}
 
 	}
