@@ -1,8 +1,8 @@
-package main
+package base;
 
 import "fmt"
 
-const Version = "3.11.18-stable"
+const Version = "4.11.17-stable"
 
 func ShowBanner() {
 	banner := `

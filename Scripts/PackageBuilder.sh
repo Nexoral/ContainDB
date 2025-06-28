@@ -21,7 +21,7 @@ for TYPE in "${FILE_TYPE[@]}"; do
     if [ -f "$VERSION_FILE" ]; then
       VERSION=$(cat "$VERSION_FILE" | tr -d '[:space:]')
     else
-      echo "❌ VERSION file not found in project root"
+      echo "❌ VERSION file not found in project Core"
       exit 1
     fi
 

@@ -95,10 +95,10 @@ echo "${new_version}-${suffix}" >"$(dirname "$0")/../VERSION"
 echo "Local version updated to ${new_version}-${suffix}"
 
 # Update static version in flagHandler.go and Banner.go
-flagHandler_go="$(dirname "$0")/../src/Root/flagHandler.go"
+flagHandler_go="$(dirname "$0")/../src/base/flagHandler.go"
 sed -i "s|^\([[:space:]]*\)VERSION :=.*|\1VERSION := \"${new_version}-${suffix}\"|" "$flagHandler_go"
 
-banner_go="$(dirname "$0")/../src/Root/Banner.go"
+banner_go="$(dirname "$0")/../src/base/Banner.go"
 sed -i "s|^\([[:space:]]*\)const Version =.*|\1const Version = \"${new_version}-${suffix}\"|" "$banner_go"
 
 echo "Updated flagHandler.go and Banner.go with new version."

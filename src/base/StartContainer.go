@@ -1,4 +1,4 @@
-package main
+package base
 
 import (
 	"ContainDB/src/Docker"
@@ -100,15 +100,15 @@ func StartContainer(database string) {
 	env := ""
 	if database == "mysql" || database == "postgresql" || database == "mariadb" {
 		fmt.Println("You need to set environment variables for the database.")
-		user := tools.AskForInput("Enter root username", "root")
-		pass := tools.AskForInput("Enter root password", "password")
+		user := tools.AskForInput("Enter Core username", "Core")
+		pass := tools.AskForInput("Enter Core password", "password")
 
 		if database == "mysql" {
-			env = fmt.Sprintf("-e MYSQL_ROOT_PASSWORD=%s", pass)
+			env = fmt.Sprintf("-e MYSQL_Core_PASSWORD=%s", pass)
 		} else if database == "postgresql" {
 			env = fmt.Sprintf("-e POSTGRES_PASSWORD=%s -e POSTGRES_USER=%s", pass, user)
 		} else if database == "mariadb" {
-			env = fmt.Sprintf("-e MARIADB_ROOT_PASSWORD=%s", pass)
+			env = fmt.Sprintf("-e MARIADB_Core_PASSWORD=%s", pass)
 		}
 
 	}
