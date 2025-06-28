@@ -10,9 +10,28 @@ import (
 )
 
 func StartPHPMyAdmin() {
-	sqlContainers := Docker.ListOfContainers([]string{"mysql", "postgres", "mariadb"})
+	// Check if phpMyAdmin is already running
+	if Docker.IsContainerRunning("phpmyadmin", true) {
+		fmt.Println("phpMyAdmin is already running.")
+		if Docker.AskYesNo("Do you want to remove the existing phpMyAdmin container and create a new one?") {
+			fmt.Println("Removing existing phpMyAdmin container...")
+			cmd := exec.Command("docker", "rm", "-f", "phpmyadmin")
+			cmd.Stdout = os.Stdout
+			cmd.Stderr = os.Stderr
+			if err := cmd.Run(); err != nil {
+				fmt.Println("Error removing phpMyAdmin container:", err)
+				return
+			}
+			fmt.Println("Existing phpMyAdmin container removed successfully.")
+		} else {
+			fmt.Println("Keeping existing phpMyAdmin container. Setup aborted.")
+			return
+		}
+	}
+
+	sqlContainers := Docker.ListOfContainers([]string{"mysql", "mariadb"})
 	if len(sqlContainers) == 0 {
-		fmt.Println("No running MySQL/PostgreSQL/MariaDB containers found.")
+		fmt.Println("No running MySQL/MariaDB containers found.")
 		return
 	}
 

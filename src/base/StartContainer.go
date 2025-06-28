@@ -32,7 +32,7 @@ func StartContainer(database string) {
 	image := imageMap[database]
 	port := defaultPorts[database]
 
-	if Docker.IsContainerRunning(image) {
+	if Docker.IsContainerRunning(image, false) {
 		fmt.Printf("Database %s is already running on port %s\n", database, port)
 		return
 	}
@@ -111,14 +111,15 @@ func StartContainer(database string) {
 		// check if pass is empty, if so, set to password
 		if pass == "" {
 			fmt.Println("Error: Password cannot be empty. Please provide a valid password.")
-			os.Exit(1);
+			os.Exit(1)
 		}
 
-		if database == "mysql" {
+		switch database {
+		case "mysql":
 			env = fmt.Sprintf("-e MYSQL_ROOT_PASSWORD=%s", pass)
-		} else if database == "postgresql" {
+		case "postgresql":
 			env = fmt.Sprintf("-e POSTGRES_PASSWORD=%s -e POSTGRES_USER=%s", pass, user)
-		} else if database == "mariadb" {
+		case "mariadb":
 			env = fmt.Sprintf("-e MARIADB_ROOT_PASSWORD=%s", pass)
 		}
 
@@ -138,20 +139,36 @@ func StartContainer(database string) {
 	} else {
 		fmt.Println("Container started successfully.")
 
-		if database == "mysql" || database == "postgresql" || database == "mariadb" {
-			consentPhpMyAdmin := Docker.AskYesNo("Do you want to install phpMyAdmin for this database?")
-			if consentPhpMyAdmin {
-				tools.StartPHPMyAdmin()
+		// Tools Istallation Suggestions
+		if database == "mysql" || database == "mariadb" {
+			// Check if phpMyAdmin is already running
+			if Docker.IsContainerRunning("phpmyadmin", true) {
+				fmt.Println("phpMyAdmin is already running.")
+				consentPhpMyAdmin := Docker.AskYesNo("Do you want to reinstall phpMyAdmin for this database?")
+				if consentPhpMyAdmin {
+					tools.StartPHPMyAdmin()
+				} else {
+					fmt.Println("You can reinstall phpMyAdmin later using the 'phpmyadmin' option.")
+				}
 			} else {
-				fmt.Println("You can install phpMyAdmin later using the 'phpmyadmin' option.")
+				consentPhpMyAdmin := Docker.AskYesNo("Do you want to install phpMyAdmin for this database?")
+				if consentPhpMyAdmin {
+					tools.StartPHPMyAdmin()
+				} else {
+					fmt.Println("You can install phpMyAdmin later using the 'phpmyadmin' option.")
+				}
 			}
-		}
-		if database == "mongodb" {
+		} else if database == "mongodb" {
 			consentCompass := Docker.AskYesNo("Do you want to install MongoDB Compass?")
 			if consentCompass {
 				tools.DownloadMongoDBCompass()
 			} else {
 				fmt.Println("You can install MongoDB Compass later using the 'mongodb compass' option.")
+			}
+		} else if database == "postgresql" {
+			pgAdminConsent := Docker.AskYesNo("Do you want to install PgAdmin? (yes/no)")
+			if pgAdminConsent {
+				tools.StartPgAdmin();
 			}
 		}
 	}

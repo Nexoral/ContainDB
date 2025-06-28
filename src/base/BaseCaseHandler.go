@@ -24,11 +24,14 @@ func BaseCaseHandler() {
 	switch action {
 	case "Install Database":
 		database := SelectDatabase()
-		if database == "phpmyadmin" {
+		switch database {
+		case "phpmyadmin":
 			tools.StartPHPMyAdmin()
-		} else if database == "MongoDB Compass" {
+		case "MongoDB Compass":
 			tools.DownloadMongoDBCompass()
-		} else {
+		case "PgAdmin":
+			tools.StartPgAdmin()
+		default:
 			StartContainer(database)
 		}
 
@@ -48,11 +51,14 @@ func BaseCaseHandler() {
 		}
 
 	case "Remove Database":
-		names, err := Docker.ListRunningDatabases();
+		names, err := Docker.ListRunningDatabases()
 
-		// Remove PhpMyAdmin if it exists from the list
+		// Remove PgAdmin, phpmyadmin if it exists from the list
 		for i, name := range names {
 			if name == "phpmyadmin" {
+				names = append(names[:i], names[i+1:]...)
+				break
+			} else if name == "pgadmin" {
 				names = append(names[:i], names[i+1:]...)
 				break
 			}

@@ -28,8 +28,13 @@ func AskYesNo(label string) bool {
 	return index == 0
 }
 
-func IsContainerRunning(image string) bool {
-	cmd := exec.Command("bash", "-c", fmt.Sprintf("docker ps --filter ancestor=%s --format '{{.Names}}'", image))
+func IsContainerRunning(nameOrImage string, checkByName bool) bool {
+	var cmd *exec.Cmd
+	if checkByName {
+		cmd = exec.Command("bash", "-c", fmt.Sprintf("docker ps --filter name=%s --format '{{.Names}}'", nameOrImage))
+	} else {
+		cmd = exec.Command("bash", "-c", fmt.Sprintf("docker ps --filter ancestor=%s --format '{{.Names}}'", nameOrImage))
+	}
 	output, _ := cmd.Output()
 	return strings.TrimSpace(string(output)) != ""
 }
