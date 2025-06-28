@@ -107,6 +107,20 @@ sudo containDB
 # Pick the container to delete (with optional volume cleanup)
 ```
 
+### 6. Remove a Docker Image
+```bash
+sudo containDB
+# Select "Remove Image"
+# Pick the image to delete (only available if not in use by any container)
+```
+
+### 7. Remove a Docker Volume
+```bash
+sudo containDB
+# Select "Remove Volume"
+# Pick the volume to delete (only available if not in use by any container)
+```
+
 ---
 
 ## Flags

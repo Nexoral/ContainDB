@@ -63,3 +63,119 @@ func RemoveDatabase(name string) error {
 
 	return nil
 }
+
+// ListDatabaseImages returns a list of database images pulled by ContainDB
+func ListDatabaseImages() ([]string, error) {
+	// List of common database images used by ContainDB
+	dbImages := []string{
+		"mongo", "mysql", "postgres", "redis", "cassandra",
+		"mariadb", "phpmyadmin", "dpage/pgadmin4",
+	}
+
+	// Build docker command to list images
+	cmd := exec.Command("docker", "images", "--format", "{{.Repository}}:{{.Tag}}")
+	output, err := cmd.Output()
+	if err != nil {
+		return nil, fmt.Errorf("failed to list images: %v", err)
+	}
+
+	lines := strings.Split(strings.TrimSpace(string(output)), "\n")
+	var images []string
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+
+		// Check if this image matches any of our database patterns
+		for _, dbImg := range dbImages {
+			if strings.HasPrefix(line, dbImg) {
+				images = append(images, line)
+				break
+			}
+		}
+	}
+
+	return images, nil
+}
+
+// IsImageInUse checks if the given image is currently used by any running container
+func IsImageInUse(image string) (bool, string, error) {
+	cmd := exec.Command("docker", "ps", "--format", "{{.Image}} {{.Names}}", "--filter", fmt.Sprintf("ancestor=%s", image))
+	output, err := cmd.Output()
+	if err != nil {
+		return false, "", fmt.Errorf("failed to check if image is in use: %v", err)
+	}
+
+	lines := strings.Split(strings.TrimSpace(string(output)), "\n")
+	if len(lines) > 0 && lines[0] != "" {
+		parts := strings.Fields(lines[0])
+		if len(parts) >= 2 {
+			return true, parts[1], nil // Return the container name
+		}
+		return true, "unknown", nil
+	}
+
+	return false, "", nil
+}
+
+// RemoveImage removes a Docker image
+func RemoveImage(image string) error {
+	cmd := exec.Command("docker", "rmi", image)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("failed to remove image: %v", err)
+	}
+	return nil
+}
+
+// ListContainDBVolumes returns a list of volumes created by ContainDB
+func ListContainDBVolumes() ([]string, error) {
+	// Common volume prefixes used by ContainDB
+	prefixes := []string{
+		"mongodb-data", "mysql-data", "postgresql-data", "redis-data",
+		"cassandra-data", "mariadb-data",
+	}
+
+	cmd := exec.Command("docker", "volume", "ls", "--format", "{{.Name}}")
+	output, err := cmd.Output()
+	if err != nil {
+		return nil, fmt.Errorf("failed to list volumes: %v", err)
+	}
+
+	lines := strings.Split(strings.TrimSpace(string(output)), "\n")
+	var volumes []string
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+
+		// Check if this volume matches any of our database patterns
+		for _, prefix := range prefixes {
+			if strings.HasPrefix(line, prefix) {
+				volumes = append(volumes, line)
+				break
+			}
+		}
+	}
+
+	return volumes, nil
+}
+
+// IsVolumeInUse checks if the given volume is currently used by any container
+func IsVolumeInUse(volume string) (bool, string, error) {
+	cmd := exec.Command("docker", "ps", "-a", "--filter", fmt.Sprintf("volume=%s", volume), "--format", "{{.Names}}")
+	output, err := cmd.Output()
+	if err != nil {
+		return false, "", fmt.Errorf("failed to check if volume is in use: %v", err)
+	}
+
+	containerName := strings.TrimSpace(string(output))
+	if containerName != "" {
+		return true, containerName, nil
+	}
+
+	return false, "", nil
+}
