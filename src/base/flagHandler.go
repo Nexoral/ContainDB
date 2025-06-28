@@ -8,7 +8,7 @@ import (
 
 // flagHandler handles command line flags for the ContainDB CLI
 func FlagHandler() {
- if len(os.Args) > 1 && os.Args[1] == "--help" {
+	if len(os.Args) > 1 && os.Args[1] == "--help" {
 		fmt.Println("ContainDB CLI - A tool for managing Docker databases")
 		fmt.Println("Usage: sudo containdb")
 		fmt.Println("Options:")

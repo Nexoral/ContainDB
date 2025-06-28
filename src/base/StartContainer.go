@@ -168,7 +168,7 @@ func StartContainer(database string) {
 		} else if database == "postgresql" {
 			pgAdminConsent := Docker.AskYesNo("Do you want to install PgAdmin? (yes/no)")
 			if pgAdminConsent {
-				tools.StartPgAdmin();
+				tools.StartPgAdmin()
 			}
 		}
 	}
