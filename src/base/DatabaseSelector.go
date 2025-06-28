@@ -9,7 +9,7 @@ import (
 )
 
 func SelectDatabase() string {
-	options := []string{"mongodb", "redis", "mysql", "postgresql", "cassandra", "mariadb", "phpmyadmin", "MongoDB Compass", "Exit"}
+	options := []string{"mongodb", "redis", "mysql", "postgresql", "cassandra", "mariadb", "phpmyadmin", "PgAdmin", "MongoDB Compass", "Exit"}
 	prompt := promptui.Select{
 		Label: "Select the service to start",
 		Items: options,

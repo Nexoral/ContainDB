@@ -8,12 +8,7 @@ import (
 
 // flagHandler handles command line flags for the ContainDB CLI
 func FlagHandler() {
-	VERSION := "4.11.17-stable"
-	// handle version flag without requiring sudo
-	if len(os.Args) > 1 && os.Args[1] == "--version" {
-		fmt.Println("ContainDB CLI Version:", VERSION)
-		os.Exit(0) // Exit after handling flags
-	} else if len(os.Args) > 1 && os.Args[1] == "--help" {
+	if len(os.Args) > 1 && os.Args[1] == "--help" {
 		fmt.Println("ContainDB CLI - A tool for managing Docker databases")
 		fmt.Println("Usage: sudo containdb")
 		fmt.Println("Options:")
