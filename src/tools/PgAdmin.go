@@ -5,6 +5,7 @@ import (
     "fmt"
     "os"
     "os/exec"
+    "strings"
 
     "github.com/manifoldco/promptui"
 )
@@ -34,7 +35,16 @@ func StartPgAdmin() {
         fmt.Println("No running SQL containers (Postgres/MySQL/MariaDB) found.")
         return
     }
-    items := append(networks, "Exit")
+    
+    // Remove pgAdmin and phpMyAdmin from the list if they exist
+    var filteredNetworks []string
+    for _, name := range networks {
+        if name != "phpmyadmin" && name != "pgadmin" {
+            filteredNetworks = append(filteredNetworks, name)
+        }
+    }
+    
+    items := append(filteredNetworks, "Exit")
     prompt := promptui.Select{
         Label: "Select a DB container to link with pgAdmin",
         Items: items,
@@ -77,6 +87,26 @@ func StartPgAdmin() {
         fmt.Println("Error starting pgAdmin:", err)
     } else {
         fmt.Printf("✅ pgAdmin started! Access it at http://localhost:%s\n", port)
+        
+        // Get container IP address
+        containerIP := ""
+        ipCmd := exec.Command("docker", "inspect", "-f", "{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}", selected)
+        ipOutput, err := ipCmd.Output()
+        if err == nil {
+            containerIP = string(ipOutput)
+            // Remove any trailing newlines
+            containerIP = strings.TrimSpace(containerIP)
+        }
+        
         fmt.Printf("Link it to your DB container '%s' inside pgAdmin.\n", selected)
+        if containerIP != "" {
+            fmt.Printf("📋 Connection information:\n")
+            fmt.Printf("   - Container name: %s\n", selected)
+            fmt.Printf("   - IP Address: %s\n", containerIP)
+            fmt.Printf("   - Port: 5432\n")
+        }
+        fmt.Printf("🔐 pgAdmin login credentials:\n")
+        fmt.Printf("   - Email: %s\n", email)
+        fmt.Printf("   - Password: %s\n", password)
     }
 }
