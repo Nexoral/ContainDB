@@ -1,25 +1,24 @@
 package main
 
 import (
-	"ContainDB/src/Docker"
-	"ContainDB/src/tools"
 	"fmt"
 	"os"
 	"os/signal"
 
+	"ContainDB/src/Docker"
+	"ContainDB/src/tools"
+
 	"github.com/manifoldco/promptui"
 )
 
-
 func main() {
-	// require sudo
-	if os.Geteuid() != 0 {
-		fmt.Println("❌ Please run this program with sudo")
-		os.Exit(1)
-	}
+	VERSION := "3.11.16-stable"
 
-	// toggle flag handler
-	flagHandler()
+	// handle version flag without requiring sudo
+	if len(os.Args) > 1 && os.Args[1] == "--version" {
+		fmt.Println("ContainDB CLI Version:", VERSION)
+		return
+	}
 
 	// Replace Ctrl+C handler to avoid triggering on normal exit
 	sigCh := make(chan os.Signal, 1)
@@ -30,6 +29,12 @@ func main() {
 		tools.Cleanup()
 		os.Exit(1)
 	}()
+
+	// require sudo
+	if os.Geteuid() != 0 {
+		fmt.Println("❌ Please run this program with sudo")
+		os.Exit(1)
+	}
 
 	if !Docker.IsDockerInstalled() {
 		fmt.Println("❌ Docker is not installed. Without Docker the tool cannot run.")
