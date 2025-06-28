@@ -69,7 +69,7 @@ func BaseCaseHandler() {
 			if err := Docker.RemoveDatabase(name); err != nil {
 				fmt.Println("Error removing database:", err)
 			} else {
-				fmt.Println("Database removed:", name)
+				fmt.Println("✅ Database", name, "removed successfully")
 			}
 		}
 

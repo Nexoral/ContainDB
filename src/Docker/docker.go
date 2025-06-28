@@ -1,6 +1,7 @@
 package Docker
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"strings"
@@ -27,15 +28,38 @@ func ListRunningDatabases() ([]string, error) {
 func RemoveDatabase(name string) error {
 	// ask user whether to delete attached volumes
 	deleteVolumes := AskYesNo("Do you want to delete associated data volumes?")
-	// build docker rm args
+
+	// Get container type from name (assuming container name follows pattern like "mongodb-container")
+	containerType := ""
+	if parts := strings.Split(name, "-"); len(parts) > 0 {
+		containerType = parts[0] // Extract database type from container name
+	}
+
+	// First remove the container itself
 	args := []string{"rm", "-f"}
 	if deleteVolumes {
-		args = append(args, "-v")
+		args = append(args, "-v") // This only removes anonymous volumes
 	}
 	args = append(args, name)
 
 	cmd := exec.Command("docker", args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	return cmd.Run()
+	err := cmd.Run()
+	if err != nil {
+		return fmt.Errorf("error removing container: %v", err)
+	}
+
+	// If user chose to delete volumes and we could identify the database type, remove named volume
+	if deleteVolumes && containerType != "" {
+		volumeName := fmt.Sprintf("%s-data", containerType)
+		if VolumeExists(volumeName) {
+			fmt.Printf("Removing associated volume: %s\n", volumeName)
+			if err := RemoveVolume(volumeName); err != nil {
+				return fmt.Errorf("error removing volume %s: %v", volumeName, err)
+			}
+		}
+	}
+
+	return nil
 }

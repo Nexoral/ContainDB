@@ -63,10 +63,8 @@ func ListOfContainers(images []string) []string {
 // VolumeExists returns true if Docker volume with given name exists
 func VolumeExists(name string) bool {
 	cmd := exec.Command("docker", "volume", "inspect", name)
-	if err := cmd.Run(); err != nil {
-		return false
-	}
-	return true
+	err := cmd.Run()
+	return err == nil
 }
 
 // CreateVolume creates a Docker volume with given name
@@ -79,8 +77,17 @@ func CreateVolume(name string) error {
 
 // RemoveVolume force-removes a Docker volume with given name
 func RemoveVolume(name string) error {
+	// First check if volume exists
+	if !VolumeExists(name) {
+		return fmt.Errorf("volume %s does not exist", name)
+	}
+
+	fmt.Printf("Removing volume %s...\n", name)
 	cmd := exec.Command("docker", "volume", "rm", "-f", name)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	return cmd.Run()
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("failed to remove volume: %v", err)
+	}
+	return nil
 }
