@@ -1,16 +1,14 @@
-package base;
+package base
 
 import (
-	"fmt"
-
 	"ContainDB/src/Docker"
 	"ContainDB/src/tools"
+	"fmt"
 
 	"github.com/manifoldco/promptui"
 )
 
 func BaseCaseHandler() {
-
 	// Top-level action menu
 	actionPrompt := promptui.Select{
 		Label: "What do you want to do?",
@@ -79,5 +77,4 @@ func BaseCaseHandler() {
 		fmt.Println("Goodbye!")
 		return
 	}
-
 }

@@ -1,13 +1,12 @@
-package main;
+package main
 
 import (
+	"ContainDB/src/Docker"
+	"ContainDB/src/base"
+	"ContainDB/src/tools"
 	"fmt"
 	"os"
 	"os/signal"
-
-	"ContainDB/src/Docker"
-	"ContainDB/src/tools"
-	"ContainDB/src/base"
 )
 
 func main() {
@@ -52,5 +51,4 @@ func main() {
 
 	// Start the base case handler which contains the main menu
 	base.BaseCaseHandler()
-
 }
