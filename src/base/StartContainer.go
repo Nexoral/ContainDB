@@ -100,7 +100,7 @@ func StartContainer(database string) {
 	env := ""
 	if database == "mysql" || database == "postgresql" || database == "mariadb" {
 		fmt.Println("You need to set environment variables for the database.")
-		user := tools.AskForInput("Enter Core username", "Core")
+		user := tools.AskForInput("Enter Core username", "root")
 		pass := tools.AskForInput("Enter Core password", "password")
 
 		if database == "mysql" {
