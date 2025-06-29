@@ -20,8 +20,6 @@ func DockerStarter() {
 			fmt.Println("Exiting. Please install Docker manually and rerun.")
 			os.Exit(1)
 		}
-		fmt.Println(("Checking system requirements..."))
-		Docker.CheckSystemRequirements() // Check system requirements before installing Docker
 		err = Docker.InstallDocker()
 		if err != nil {
 			fmt.Println("Failed to install Docker:", err)
