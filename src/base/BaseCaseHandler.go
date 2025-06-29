@@ -12,7 +12,7 @@ func BaseCaseHandler() {
 	// Top-level action menu
 	actionPrompt := promptui.Select{
 		Label: "What do you want to do?",
-		Items: []string{"Install Database", "List Databases", "Remove Database", "Remove Image", "Remove Volume", "Exit"},
+		Items: []string{"Install Database", "List Databases", "Remove Database", "Remove Image", "Remove Volume", "Export Services", "Exit"},
 	}
 	_, action, err := actionPrompt.Run()
 	if err != nil {
@@ -187,7 +187,14 @@ func BaseCaseHandler() {
 		} else {
 			fmt.Printf("✅ Volume '%s' removed successfully\n", selected)
 		}
+	case "Export Services":
+		fmt.Println("Exporting Docker Compose file with all running services...")
+		filePath := Docker.MakeDockerComposeWithAllServices()
+		if filePath == "" {
+			fmt.Println("Failed to create Docker Compose file.")
+		}
 
+	// Handle exit case
 	case "Exit":
 		fmt.Println("Goodbye!")
 		return
