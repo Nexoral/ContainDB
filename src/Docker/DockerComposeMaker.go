@@ -335,7 +335,6 @@ networks:
 			return strings.Join(lines, "\n")
 		},
 	}).Parse(composeTemplate)
-
 	if err != nil {
 		fmt.Printf("Error creating template: %v\n", err)
 		return ""

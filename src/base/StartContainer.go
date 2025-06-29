@@ -135,7 +135,7 @@ func StartContainer(database string) {
 		fmt.Println("Error starting container:", err)
 	} else {
 		fmt.Println("Container started successfully.")
-			// Tools Installation Suggestions
-			tools.AfterContainerToolInstaller(database)
+		// Tools Installation Suggestions
+		tools.AfterContainerToolInstaller(database)
 	}
 }

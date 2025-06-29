@@ -68,7 +68,6 @@ func BaseCaseHandler() {
 
 	case "Remove Database":
 		names, err := Docker.ListRunningDatabases()
-
 		if err != nil {
 			fmt.Println("Error listing databases:", err)
 			return
