@@ -43,7 +43,7 @@ ContainDB is an open-source CLI tool that automates the creation, management, an
 - **🔐 Security Controls**: Interactive prompts for credentials and access control
 - **🧩 Extensible Design**: Support for multiple database types and management tools
 - **⚙️ Customization**: Configure ports, restart policies, and environment variables
-- **📊 Management Tools**: One-click setup for phpMyAdmin, pgAdmin, and MongoDB Compass
+- **📊 Management Tools**: One-click setup for phpMyAdmin, pgAdmin, RedisInsight, and MongoDB Compass
 - **🧹 Easy Cleanup**: Simple commands to remove containers, images, and volumes
 - **🧠 Smart Detection**: Checks for existing resources to avoid conflicts
 - **🔄 Auto-Rollback**: Automatic cleanup of resources if any errors occur during setup
@@ -92,7 +92,7 @@ You'll be greeted with an attractive banner and a simple menu system that guides
 | MySQL      | phpMyAdmin       |
 | PostgreSQL | pgAdmin          |
 | MariaDB    | (uses phpMyAdmin)|
-| Redis      |                  |
+| Redis      | RedisInsight     |
 
 ## Usage Examples
 
@@ -126,9 +126,25 @@ Link it to your DB container 'postgresql-container' inside pgAdmin.
 ```bash
 sudo containDB
 # Select "Install Database"
-# Choose "phpMyAdmin" or "PgAdmin" or "MongoDB Compass"
+# Choose "phpMyAdmin", "PgAdmin", "Redis Insight", or "MongoDB Compass"
 # Select the container to manage
 # Follow the interactive prompts
+```
+
+#### Using RedisInsight with Your Redis Instance
+
+After setting up a Redis container and launching RedisInsight:
+
+1. Access the RedisInsight web interface at `http://localhost:8001` (or your custom port)
+2. Add a new Redis database connection using:
+   - Host: Your Redis container name (e.g., `redis-container`)
+   - Port: `6379`
+   - Use the Docker network's built-in DNS to connect automatically
+
+```
+✅ RedisInsight started. Access it at: http://localhost:8001
+👉 In the RedisInsight UI, add a Redis database with host: `redis-container`, port: `6379`
+   (RedisInsight will resolve container name using Docker network DNS.)
 ```
 
 ### Managing Existing Resources
@@ -297,6 +313,7 @@ ContainDB has become an essential part of my development workflow by:
 - **Isolating Services**: Preventing conflicts between different database versions
 - **Managing Resources**: Making cleanup and maintenance straightforward
 - **Bypassing System Compatibility Issues**: Avoiding the notorious MongoDB "core dumped" errors on Debian systems
+- **Visual Database Management**: Quick setup of GUI tools like RedisInsight for better productivity
 
 Real-world example: When working on a new microservice project, I can spin up a PostgreSQL instance, link it to pgAdmin, and have a fully functional development environment in less than a minute - all with proper network configuration and persistence.
 
@@ -332,6 +349,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - The Docker team for creating an amazing containerization platform
 - The Go community for providing excellent libraries and tools
+- Redis Labs for the RedisInsight tool
 - All contributors who have helped improve ContainDB
 
 ---
