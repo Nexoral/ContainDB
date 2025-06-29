@@ -192,7 +192,7 @@ func BaseCaseHandler() {
 		fmt.Println("\n⚠️  IMPORTANT: The export functionality only exports container configurations, not the actual data.")
 		fmt.Println("   Even if you used data persistence during installation, the exported compose file only")
 		fmt.Println("   references local volume paths from your current machine which won't exist on other systems.")
-		fmt.Println("   For data backup, please use each database's native backup tools.\n")
+		fmt.Print("   For data backup, please use each database's native backup tools.\n\n")
 
 		filePath := Docker.MakeDockerComposeWithAllServices()
 		if filePath == "" {
