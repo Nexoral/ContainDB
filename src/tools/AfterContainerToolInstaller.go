@@ -51,5 +51,14 @@ func AfterContainerToolInstaller(database string) {
 		if pgAdminConsent {
 			StartPgAdmin()
 		}
+	case "redis":
+		redisInsightConsent := Docker.AskYesNo("Do you want to install Redis Insight? (yes/no)")
+		if redisInsightConsent {
+			StartRedisInsight()
+		} else {
+			fmt.Println("You can install Redis Insight later using the 'redis insight' option.")
+		}
+	default:
+		fmt.Println("No additional tools available for this database type.")
 	}
 }

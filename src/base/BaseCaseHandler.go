@@ -31,6 +31,8 @@ func BaseCaseHandler() {
 			tools.DownloadMongoDBCompass()
 		case "PgAdmin":
 			tools.StartPgAdmin()
+		case "Redis Insight":
+			tools.StartRedisInsight()
 		default:
 			StartContainer(database)
 		}
@@ -44,6 +46,9 @@ func BaseCaseHandler() {
 				names = append(names[:i], names[i+1:]...)
 				break
 			} else if name == "pgadmin" {
+				names = append(names[:i], names[i+1:]...)
+				break
+			} else if name == "redisinsight" {
 				names = append(names[:i], names[i+1:]...)
 				break
 			}
@@ -64,20 +69,9 @@ func BaseCaseHandler() {
 	case "Remove Database":
 		names, err := Docker.ListRunningDatabases()
 
-		// Remove PgAdmin, phpmyadmin if it exists from the list
-		for i, name := range names {
-			if name == "phpmyadmin" {
-				names = append(names[:i], names[i+1:]...)
-				break
-			} else if name == "pgadmin" {
-				names = append(names[:i], names[i+1:]...)
-				break
-			}
-		}
 		if err != nil {
 			fmt.Println("Error listing databases:", err)
-			return
-		}
+			return}
 		if len(names) == 0 {
 			fmt.Println("No running databases to remove.")
 		} else {
