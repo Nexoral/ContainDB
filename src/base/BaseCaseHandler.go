@@ -71,7 +71,8 @@ func BaseCaseHandler() {
 
 		if err != nil {
 			fmt.Println("Error listing databases:", err)
-			return}
+			return
+		}
 		if len(names) == 0 {
 			fmt.Println("No running databases to remove.")
 		} else {
@@ -189,9 +190,17 @@ func BaseCaseHandler() {
 		}
 	case "Export Services":
 		fmt.Println("Exporting Docker Compose file with all running services...")
+		fmt.Println("\n⚠️  IMPORTANT: The export functionality only exports container configurations, not the actual data.")
+		fmt.Println("   Even if you used data persistence during installation, the exported compose file only")
+		fmt.Println("   references local volume paths from your current machine which won't exist on other systems.")
+		fmt.Println("   For data backup, please use each database's native backup tools.\n")
+
 		filePath := Docker.MakeDockerComposeWithAllServices()
 		if filePath == "" {
 			fmt.Println("Failed to create Docker Compose file.")
+		} else {
+			fmt.Println("\n✅ Docker Compose file created successfully at:", filePath)
+			fmt.Println("   This file contains only the configuration of your containers.")
 		}
 
 	// Handle exit case

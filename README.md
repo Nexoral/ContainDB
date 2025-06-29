@@ -47,6 +47,7 @@ ContainDB is an open-source CLI tool that automates the creation, management, an
 - **🧹 Easy Cleanup**: Simple commands to remove containers, images, and volumes
 - **🧠 Smart Detection**: Checks for existing resources to avoid conflicts
 - **🔄 Auto-Rollback**: Automatic cleanup of resources if any errors occur during setup
+- **📦 Docker Compose Export**: Export your database configurations as a docker-compose.yml file that you can run anytime, anywhere
 
 ## Installation
 
@@ -157,6 +158,76 @@ sudo containDB
 # Select "Remove Volume" to delete persistent data volumes
 ```
 
+### Exporting Docker Compose Configuration
+
+Export your running databases and management tools as a Docker Compose file:
+
+```bash
+sudo containDB --export
+```
+
+Or from the interactive menu:
+
+```bash
+sudo containDB
+# Select "Export Services"
+```
+
+This creates a `docker-compose.yml` file in your current directory that you can use to recreate your entire database environment on any system with Docker:
+
+```bash
+# Move the docker-compose.yml to your project
+cp docker-compose.yml /path/to/your/project/
+
+# Run it anywhere
+cd /path/to/your/project
+docker-compose up -d
+```
+
+⚠️ **Important Note about Data Persistence**: The exported Docker Compose file contains only the configuration of your containers, not the actual database data. If you set up data persistence when installing a database, the exported file will reference the volume paths from your original machine. When running the exported compose file on another machine or after resetting your system, your previous data will not be available. For data backup and migration, you should use each database's native backup and restore functionality.
+
+#### How the Export Feature Works Internally
+
+---------------------------------------
+
+```
+┌────────────────────────────┐                ┌─────────────────────┐
+│ ContainDB CLI              │                │ Running Docker      │
+│ (export command)           │                │ Containers          │
+└─────────────┬──────────────┘                └──────────┬──────────┘
+              │                                          │
+              │ 1. Identify running containers           │
+              ├──────────────────────────────────────────┘
+              │
+              │                                ┌─────────────────────┐
+              │ 2. Inspect container details   │ Container           │
+              ├─────────────────────────────────> Configuration Data │
+              │                                └─────────────────────┘
+              │
+              │ 3. Extract settings:
+              │ - Image name & tag
+              │ - Container name
+              │ - Port mappings
+              │ - Environment variables
+              │ - Volume mounts
+              │ - Network configuration
+              │ - Restart policies
+              │ - Command overrides
+              │
+              ▼
+┌────────────────────────────┐
+│ docker-compose.yml         │                 ┌─────────────────────┐
+│ Generation                 │                 │ Local File System   │
+└─────────────┬──────────────┘                 └──────────┬──────────┘
+              │                                           │
+              │ 4. Write docker-compose.yml file          │
+              └───────────────────────────────────────────┘
+```
+
+This diagram shows how the ContainDB export feature captures the configuration of your running containers without copying the actual data stored in volumes. The generated docker-compose.yml provides a template for recreating your database infrastructure but requires separate data migration for full restoration.
+
+---------------------------------------
+
 ## Architecture
 
 ContainDB follows a layered architecture that separates concerns and promotes code organization.
@@ -241,7 +312,7 @@ For tools like phpMyAdmin, pgAdmin, or MongoDB Compass, ContainDB handles:
                                             ▼
                                   ┌─────────────────────┐
                                   │ Management Tool     │
-                                  │ Container/App       │
+                                  │ Container/App       |
                                   └─────────────────────┘
 ```
 
