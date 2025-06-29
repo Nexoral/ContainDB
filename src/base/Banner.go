@@ -27,11 +27,11 @@ func ShowBanner() {
 
 	welcomeMsg := "An Awesome Project to Manage Your Databases in Containers by Ankan Saha"
 	padding := (termWidth - len(welcomeMsg)) / 2
-	
-	banner := "\n" + strings.Repeat(" ", padding) + 
-		strings.ToUpper(welcomeMsg) + 
+
+	banner := "\n" + strings.Repeat(" ", padding) +
+		strings.ToUpper(welcomeMsg) +
 		strings.Repeat(" ", padding) + "\n"
-		
+
 	// Create a box around the message
 	horizontalLine := strings.Repeat("═", termWidth)
 	banner = "\n" + horizontalLine + "\n" + banner + horizontalLine + "\n"
@@ -41,7 +41,7 @@ func ShowBanner() {
 	border := boldCyan(strings.Repeat("─", 80))
 	fmt.Println(border)
 
-	fmt.Printf("%s\n", boldWhite("🛠️  Welcome to ") + boldGreen("ContainDB") + boldWhite(" - Containerized Database Manager CLI"))
+	fmt.Printf("%s\n", boldWhite("🛠️  Welcome to ")+boldGreen("ContainDB")+boldWhite(" - Containerized Database Manager CLI"))
 	fmt.Println(border)
 
 	// Info Block
@@ -54,7 +54,7 @@ func ShowBanner() {
 	fmt.Printf("%s %s\n", boldCyan("💬 Feedback:"), white("Feel free to open issues or discussions on GitHub"))
 
 	fmt.Println(border)
-	fmt.Printf("%s\n", boldCyan("⚡ Tip: ") + dim("Run `containDB --help` to see available commands."))
+	fmt.Printf("%s\n", boldCyan("⚡ Tip: ")+dim("Run `containDB --help` to see available commands."))
 	fmt.Println(border)
 	fmt.Println()
 }

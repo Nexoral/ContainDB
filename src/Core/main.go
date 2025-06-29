@@ -35,7 +35,7 @@ func main() {
 		fmt.Println("❌ Please run this program with sudo")
 		os.Exit(1)
 	}
-	
+
 	// Check if running on Ubuntu or Debian-based system
 	osReleaseBytes, err := os.ReadFile("/etc/os-release")
 	if err != nil {
@@ -43,20 +43,18 @@ func main() {
 		os.Exit(1)
 	}
 	osRelease := string(osReleaseBytes)
-	if !strings.Contains(strings.ToLower(osRelease), "ubuntu") && 
-	   !strings.Contains(strings.ToLower(osRelease), "debian") {
+	if !strings.Contains(strings.ToLower(osRelease), "ubuntu") &&
+		!strings.Contains(strings.ToLower(osRelease), "debian") {
 		fmt.Println("❌ This program requires Ubuntu or Debian-based system")
 		os.Exit(1)
 	}
-	
+
 	// Check if bash shell is available
 	_, err = exec.LookPath("bash")
 	if err != nil {
 		fmt.Println("❌ bash shell not found. This program requires bash to be installed")
 		os.Exit(1)
 	}
-
-
 
 	// Check if Docker is installed and if not, prompt to install it
 	base.DockerStarter()
