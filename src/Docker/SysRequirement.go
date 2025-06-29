@@ -13,8 +13,6 @@ func CheckSystemRequirements() {
 	// Check if Docker is installed and accessible
 	if err := checkDockerInstallation(); err != nil {
 		fmt.Printf("WARNING: %v\n", err)
-		fmt.Println("Exiting program due to Docker requirement failure")
-		os.Exit(1)
 	}
 
 	// Check if system has enough RAM (minimum 2GB recommended)
