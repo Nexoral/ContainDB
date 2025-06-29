@@ -56,10 +56,10 @@ ContainDB is an open-source CLI tool that automates the creation, management, an
 
 ```bash
 # Download latest .deb release
-wget https://github.com/AnkanSaha/ContainDB/releases/download/v4.12.19-stable/containDB_4.12.19-stable_amd64.deb
+wget https://github.com/AnkanSaha/ContainDB/releases/download/v5.12.19-stable/containDB_5.12.19-stable_amd64.deb
 
 # Install the package
-sudo dpkg -i containDB_4.12.19-stable_amd64.deb
+sudo dpkg -i containDB_5.12.19-stable_amd64.deb
 ```
 
 ### Option 2: Build from Source
