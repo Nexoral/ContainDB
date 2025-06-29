@@ -138,38 +138,7 @@ func StartContainer(database string) {
 		fmt.Println("Error starting container:", err)
 	} else {
 		fmt.Println("Container started successfully.")
-
-		// Tools Istallation Suggestions
-		if database == "mysql" || database == "mariadb" {
-			// Check if phpMyAdmin is already running
-			if Docker.IsContainerRunning("phpmyadmin", true) {
-				fmt.Println("phpMyAdmin is already running.")
-				consentPhpMyAdmin := Docker.AskYesNo("Do you want to reinstall phpMyAdmin for this database?")
-				if consentPhpMyAdmin {
-					tools.StartPHPMyAdmin()
-				} else {
-					fmt.Println("You can reinstall phpMyAdmin later using the 'phpmyadmin' option.")
-				}
-			} else {
-				consentPhpMyAdmin := Docker.AskYesNo("Do you want to install phpMyAdmin for this database?")
-				if consentPhpMyAdmin {
-					tools.StartPHPMyAdmin()
-				} else {
-					fmt.Println("You can install phpMyAdmin later using the 'phpmyadmin' option.")
-				}
-			}
-		} else if database == "mongodb" {
-			consentCompass := Docker.AskYesNo("Do you want to install MongoDB Compass?")
-			if consentCompass {
-				tools.DownloadMongoDBCompass()
-			} else {
-				fmt.Println("You can install MongoDB Compass later using the 'mongodb compass' option.")
-			}
-		} else if database == "postgresql" {
-			pgAdminConsent := Docker.AskYesNo("Do you want to install PgAdmin? (yes/no)")
-			if pgAdminConsent {
-				tools.StartPgAdmin()
-			}
-		}
+			// Tools Installation Suggestions
+			tools.AfterContainerToolInstaller(database)
 	}
 }
