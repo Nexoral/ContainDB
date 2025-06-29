@@ -17,7 +17,7 @@ func FlagHandler() {
 		fmt.Println("  --install-docker   Install Docker if not installed")
 		fmt.Println("  --uninstall-docker Uninstall Docker if installed")
 		fmt.Println("  --export   Export Docker Compose file with all running services")
-		fmt.Println("  --import FILE      Import and run services from a Docker Compose file")
+		fmt.Println("  --import ./docker-compose.yml      Import and run services from a Docker Compose file")
 		os.Exit(0) // Exit after handling flags
 	} else if len(os.Args) > 1 && os.Args[1] == "--install-docker" {
 		if !Docker.IsDockerInstalled() {

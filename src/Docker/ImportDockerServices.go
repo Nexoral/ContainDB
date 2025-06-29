@@ -16,11 +16,14 @@ import (
 type DockerComposeConfig struct {
 	Version  string                          `yaml:"version"`
 	Services map[string]DockerComposeService `yaml:"services"`
+	Volumes  map[string]interface{}          `yaml:"volumes"`
 }
 
 // DockerComposeService represents a service in a docker-compose.yml file
 type DockerComposeService struct {
-	Ports []string `yaml:"ports"`
+	Ports       []string          `yaml:"ports"`
+	Volumes     []string          `yaml:"volumes"`
+	Environment map[string]string `yaml:"environment"`
 	// Add other fields as needed
 }
 
@@ -69,9 +72,28 @@ func ImportDockerServices(composeFilePath string) error {
 		}
 	}
 
+	// Create volumes if they don't exist
+	fmt.Println("Creating volumes...")
+	if len(composeConfig.Volumes) > 0 {
+		for volumeName := range composeConfig.Volumes {
+			if !volumeExists(volumeName) {
+				fmt.Printf("Creating volume '%s'...\n", volumeName)
+				cmd := exec.Command("docker", "volume", "create", volumeName)
+				cmd.Stdout = os.Stdout
+				cmd.Stderr = os.Stderr
+				err := cmd.Run()
+				if err != nil {
+					return fmt.Errorf("failed to create volume '%s': %v", volumeName, err)
+				}
+			} else {
+				fmt.Printf("Volume '%s' already exists\n", volumeName)
+			}
+		}
+	}
+
 	// Start services using docker-compose up -d
 	fmt.Println("Starting services...")
-	cmd := exec.Command("docker compose", "-f", composeFilePath, "up", "-d")
+	cmd := exec.Command("docker", "compose", "-f", composeFilePath, "up", "-d")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	err = cmd.Run()
@@ -80,6 +102,13 @@ func ImportDockerServices(composeFilePath string) error {
 	}
 
 	return nil
+}
+
+// Helper function to check if a volume exists
+func volumeExists(name string) bool {
+	cmd := exec.Command("docker", "volume", "inspect", name)
+	err := cmd.Run()
+	return err == nil
 }
 
 // getRunningContainers returns a list of running Docker containers
