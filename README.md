@@ -48,6 +48,7 @@ ContainDB is an open-source CLI tool that automates the creation, management, an
 - **🧠 Smart Detection**: Checks for existing resources to avoid conflicts
 - **🔄 Auto-Rollback**: Automatic cleanup of resources if any errors occur during setup
 - **📦 Docker Compose Export**: Export your database configurations as a docker-compose.yml file that you can run anytime, anywhere
+- **📥 Docker Compose Import**: Import and deploy services from existing docker-compose.yml files with automatic conflict resolution
 
 ## Installation
 
@@ -225,6 +226,70 @@ docker-compose up -d
 ```
 
 This diagram shows how the ContainDB export feature captures the configuration of your running containers without copying the actual data stored in volumes. The generated docker-compose.yml provides a template for recreating your database infrastructure but requires separate data migration for full restoration.
+
+---------------------------------------
+
+### Importing Docker Compose Configuration
+
+Import and deploy services from an existing docker-compose.yml file:
+
+```bash
+sudo containDB --import /path/to/docker-compose.yml
+```
+
+Or from the interactive menu:
+
+```bash
+sudo containDB
+# Select "Import Services"
+# Provide the path to your docker-compose.yml file
+```
+
+This feature analyzes your docker-compose.yml file and deploys all services with proper configuration:
+
+```bash
+# Example docker-compose.yml import
+sudo containDB --import /home/user/my-project/docker-compose.yml
+```
+
+⚠️ **Important Note about Importing**: Before importing, ContainDB will check for port conflicts and existing volumes. You'll receive warnings about potential conflicts, allowing you to make decisions before deployment proceeds. The import feature intelligently handles Docker network creation and connects all imported services to the ContainDB network for seamless integration with your existing containers.
+
+#### How the Import Feature Works Internally
+
+---------------------------------------
+
+```
+┌────────────────────────────┐                ┌─────────────────────┐
+│ ContainDB CLI              │                │ docker-compose.yml  │
+│ (import command)           │                │ File                │
+└─────────────┬──────────────┘                └──────────┬──────────┘
+              │                                          │
+              │ 1. Read & parse compose file             │
+              ├──────────────────────────────────────────┘
+              │
+              │ 2. Validate Docker installation
+              │
+              │ 3. Check for existing services   ┌─────────────────────┐
+              ├─────────────────────────────────>│ Running Docker      │
+              │                                  │ Containers          │
+              │                                  └─────────────────────┘
+              │
+              │ 4. Check for port conflicts      ┌─────────────────────┐
+              ├─────────────────────────────────>│ Host System Ports   │
+              │                                  └─────────────────────┘
+              │
+              │ 5. Set up volumes                ┌─────────────────────┐
+              ├─────────────────────────────────>│ Docker Volumes      │
+              │                                  └─────────────────────┘
+              │
+              ▼
+┌────────────────────────────┐
+│ Docker Compose Command     │                 ┌─────────────────────┐
+│ Execution                  │---------------->│ Deployed Services   │
+└────────────────────────────┘                 └─────────────────────┘
+```
+
+This diagram illustrates how ContainDB imports services from a docker-compose.yml file, checking for conflicts and setting up the necessary resources before deploying the services to ensure a smooth integration with your existing environment.
 
 ---------------------------------------
 
