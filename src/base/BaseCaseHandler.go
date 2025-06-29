@@ -12,7 +12,7 @@ func BaseCaseHandler() {
 	// Top-level action menu
 	actionPrompt := promptui.Select{
 		Label: "What do you want to do?",
-		Items: []string{"Install Database", "List Databases", "Remove Database", "Remove Image", "Remove Volume", "Export Services", "Exit"},
+		Items: []string{"Install Database", "List Databases", "Remove Database", "Remove Image", "Remove Volume", "Import Services", "Export Services", "Exit"},
 	}
 	_, action, err := actionPrompt.Run()
 	if err != nil {
@@ -201,6 +201,24 @@ func BaseCaseHandler() {
 			fmt.Println("\n✅ Docker Compose file created successfully at:", filePath)
 			fmt.Println("   This file contains only the configuration of your containers.")
 		}
+	case "Import Services":
+		fmt.Println("Importing services from Docker Compose file...")
+		fmt.Println("\n⚠️  IMPORTANT: The import functionality requires a valid docker-compose.yml file.")
+		fmt.Println("   Ensure the file contains correct service definitions and port mappings.")
+
+		// Use SelectFilePath instead of promptui.Prompt for better tab completion
+		filePath, err := SelectFilePath("Enter path to docker-compose.yml file", "docker-compose.yml", ".yml")
+		if err != nil {
+			fmt.Println("Error selecting file:", err)
+			return
+		}
+
+		err = Docker.ImportDockerServices(filePath)
+		if err != nil {
+			fmt.Printf("Failed to import services: %s\n", err)
+			return
+		}
+		fmt.Println("Services imported and started successfully!")
 
 	// Handle exit case
 	case "Exit":

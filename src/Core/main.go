@@ -6,11 +6,13 @@ import (
 	"ContainDB/src/tools"
 	"fmt"
 	"os"
+	"os/exec"
 	"os/signal"
+	"strings"
 )
 
 func main() {
-	VERSION := "4.12.19-stable"
+	VERSION := "5.12.19-stable"
 
 	// handle version flag without requiring sudo
 	if len(os.Args) > 1 && os.Args[1] == "--version" {
@@ -34,14 +36,34 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Check if running on Ubuntu or Debian-based system
+	osReleaseBytes, err := os.ReadFile("/etc/os-release")
+	if err != nil {
+		fmt.Println("❌ Unable to determine OS distribution")
+		os.Exit(1)
+	}
+	osRelease := string(osReleaseBytes)
+	if !strings.Contains(strings.ToLower(osRelease), "ubuntu") &&
+		!strings.Contains(strings.ToLower(osRelease), "debian") {
+		fmt.Println("❌ This program requires Ubuntu or Debian-based system")
+		os.Exit(1)
+	}
+
+	// Check if bash shell is available
+	_, err = exec.LookPath("bash")
+	if err != nil {
+		fmt.Println("❌ bash shell not found. This program requires bash to be installed")
+		os.Exit(1)
+	}
+
 	// Check if Docker is installed and if not, prompt to install it
 	base.DockerStarter()
 
 	// Handle command line flags with FlagHandler function
 	base.FlagHandler()
 
-	err := Docker.CreateDockerNetworkIfNotExists()
-	if err != nil {
+	errs := Docker.CreateDockerNetworkIfNotExists()
+	if errs != nil {
 		fmt.Println("Failed to create Docker network:", err)
 		return
 	}
