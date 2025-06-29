@@ -12,7 +12,7 @@ func BaseCaseHandler() {
 	// Top-level action menu
 	actionPrompt := promptui.Select{
 		Label: "What do you want to do?",
-		Items: []string{"Install Database", "List Databases", "Remove Database", "Remove Image", "Remove Volume", "Exit"},
+		Items: []string{"Install Database", "List Databases", "Remove Database", "Remove Image", "Remove Volume", "Export Services", "Exit"},
 	}
 	_, action, err := actionPrompt.Run()
 	if err != nil {
@@ -31,6 +31,8 @@ func BaseCaseHandler() {
 			tools.DownloadMongoDBCompass()
 		case "PgAdmin":
 			tools.StartPgAdmin()
+		case "Redis Insight":
+			tools.StartRedisInsight()
 		default:
 			StartContainer(database)
 		}
@@ -44,6 +46,9 @@ func BaseCaseHandler() {
 				names = append(names[:i], names[i+1:]...)
 				break
 			} else if name == "pgadmin" {
+				names = append(names[:i], names[i+1:]...)
+				break
+			} else if name == "redisinsight" {
 				names = append(names[:i], names[i+1:]...)
 				break
 			}
@@ -63,17 +68,6 @@ func BaseCaseHandler() {
 
 	case "Remove Database":
 		names, err := Docker.ListRunningDatabases()
-
-		// Remove PgAdmin, phpmyadmin if it exists from the list
-		for i, name := range names {
-			if name == "phpmyadmin" {
-				names = append(names[:i], names[i+1:]...)
-				break
-			} else if name == "pgadmin" {
-				names = append(names[:i], names[i+1:]...)
-				break
-			}
-		}
 		if err != nil {
 			fmt.Println("Error listing databases:", err)
 			return
@@ -193,7 +187,22 @@ func BaseCaseHandler() {
 		} else {
 			fmt.Printf("✅ Volume '%s' removed successfully\n", selected)
 		}
+	case "Export Services":
+		fmt.Println("Exporting Docker Compose file with all running services...")
+		fmt.Println("\n⚠️  IMPORTANT: The export functionality only exports container configurations, not the actual data.")
+		fmt.Println("   Even if you used data persistence during installation, the exported compose file only")
+		fmt.Println("   references local volume paths from your current machine which won't exist on other systems.")
+		fmt.Println("   For data backup, please use each database's native backup tools.\n")
 
+		filePath := Docker.MakeDockerComposeWithAllServices()
+		if filePath == "" {
+			fmt.Println("Failed to create Docker Compose file.")
+		} else {
+			fmt.Println("\n✅ Docker Compose file created successfully at:", filePath)
+			fmt.Println("   This file contains only the configuration of your containers.")
+		}
+
+	// Handle exit case
 	case "Exit":
 		fmt.Println("Goodbye!")
 		return

@@ -25,6 +25,9 @@ As developers, we often face these frustrating scenarios:
 - Struggling with complex Docker commands for simple database tasks
 - Managing database persistence, networking, and tools separately
 - Lack of a unified interface for different database systems
+- **MongoDB "Core Dumped" errors on Debian-based systems** that are nearly impossible for beginners to troubleshoot
+
+This last point was a major motivation for creating ContainDB. As a developer working on Debian-based systems, I repeatedly encountered the dreaded "Core Dumped" error when trying to install MongoDB natively. After spending countless hours troubleshooting compatibility issues, library dependencies, and system configurations, I realized there needed to be a better way.
 
 ContainDB was born out of these pain points. I wanted a simple CLI tool that could handle all database container operations with minimal effort, allowing me to focus on actual development rather than environment setup.
 
@@ -40,9 +43,11 @@ ContainDB is an open-source CLI tool that automates the creation, management, an
 - **🔐 Security Controls**: Interactive prompts for credentials and access control
 - **🧩 Extensible Design**: Support for multiple database types and management tools
 - **⚙️ Customization**: Configure ports, restart policies, and environment variables
-- **📊 Management Tools**: One-click setup for phpMyAdmin, pgAdmin, and MongoDB Compass
+- **📊 Management Tools**: One-click setup for phpMyAdmin, pgAdmin, RedisInsight, and MongoDB Compass
 - **🧹 Easy Cleanup**: Simple commands to remove containers, images, and volumes
 - **🧠 Smart Detection**: Checks for existing resources to avoid conflicts
+- **🔄 Auto-Rollback**: Automatic cleanup of resources if any errors occur during setup
+- **📦 Docker Compose Export**: Export your database configurations as a docker-compose.yml file that you can run anytime, anywhere
 
 ## Installation
 
@@ -50,10 +55,10 @@ ContainDB is an open-source CLI tool that automates the creation, management, an
 
 ```bash
 # Download latest .deb release
-wget https://github.com/AnkanSaha/ContainDB/releases/download/v4.12.17-stable/containDB_4.12.17-stable_amd64.deb
+wget https://github.com/AnkanSaha/ContainDB/releases/download/v4.12.18-stable/containDB_4.12.18-stable_amd64.deb
 
 # Install the package
-sudo dpkg -i containDB_4.12.17-stable_amd64.deb
+sudo dpkg -i containDB_4.12.18-stable_amd64.deb
 ```
 
 ### Option 2: Build from Source
@@ -88,8 +93,7 @@ You'll be greeted with an attractive banner and a simple menu system that guides
 | MySQL      | phpMyAdmin       |
 | PostgreSQL | pgAdmin          |
 | MariaDB    | (uses phpMyAdmin)|
-| Redis      |                  |
-| Cassandra  |                  |
+| Redis      | RedisInsight     |
 
 ## Usage Examples
 
@@ -123,9 +127,25 @@ Link it to your DB container 'postgresql-container' inside pgAdmin.
 ```bash
 sudo containDB
 # Select "Install Database"
-# Choose "phpMyAdmin" or "PgAdmin" or "MongoDB Compass"
+# Choose "phpMyAdmin", "PgAdmin", "Redis Insight", or "MongoDB Compass"
 # Select the container to manage
 # Follow the interactive prompts
+```
+
+#### Using RedisInsight with Your Redis Instance
+
+After setting up a Redis container and launching RedisInsight:
+
+1. Access the RedisInsight web interface at `http://localhost:8001` (or your custom port)
+2. Add a new Redis database connection using:
+   - Host: Your Redis container name (e.g., `redis-container`)
+   - Port: `6379`
+   - Use the Docker network's built-in DNS to connect automatically
+
+```
+✅ RedisInsight started. Access it at: http://localhost:8001
+👉 In the RedisInsight UI, add a Redis database with host: `redis-container`, port: `6379`
+   (RedisInsight will resolve container name using Docker network DNS.)
 ```
 
 ### Managing Existing Resources
@@ -137,6 +157,76 @@ sudo containDB
 # Select "Remove Image" to delete Docker images
 # Select "Remove Volume" to delete persistent data volumes
 ```
+
+### Exporting Docker Compose Configuration
+
+Export your running databases and management tools as a Docker Compose file:
+
+```bash
+sudo containDB --export
+```
+
+Or from the interactive menu:
+
+```bash
+sudo containDB
+# Select "Export Services"
+```
+
+This creates a `docker-compose.yml` file in your current directory that you can use to recreate your entire database environment on any system with Docker:
+
+```bash
+# Move the docker-compose.yml to your project
+cp docker-compose.yml /path/to/your/project/
+
+# Run it anywhere
+cd /path/to/your/project
+docker-compose up -d
+```
+
+⚠️ **Important Note about Data Persistence**: The exported Docker Compose file contains only the configuration of your containers, not the actual database data. If you set up data persistence when installing a database, the exported file will reference the volume paths from your original machine. When running the exported compose file on another machine or after resetting your system, your previous data will not be available. For data backup and migration, you should use each database's native backup and restore functionality.
+
+#### How the Export Feature Works Internally
+
+---------------------------------------
+
+```
+┌────────────────────────────┐                ┌─────────────────────┐
+│ ContainDB CLI              │                │ Running Docker      │
+│ (export command)           │                │ Containers          │
+└─────────────┬──────────────┘                └──────────┬──────────┘
+              │                                          │
+              │ 1. Identify running containers           │
+              ├──────────────────────────────────────────┘
+              │
+              │                                ┌─────────────────────┐
+              │ 2. Inspect container details   │ Container           │
+              ├─────────────────────────────────> Configuration Data │
+              │                                └─────────────────────┘
+              │
+              │ 3. Extract settings:
+              │ - Image name & tag
+              │ - Container name
+              │ - Port mappings
+              │ - Environment variables
+              │ - Volume mounts
+              │ - Network configuration
+              │ - Restart policies
+              │ - Command overrides
+              │
+              ▼
+┌────────────────────────────┐
+│ docker-compose.yml         │                 ┌─────────────────────┐
+│ Generation                 │                 │ Local File System   │
+└─────────────┬──────────────┘                 └──────────┬──────────┘
+              │                                           │
+              │ 4. Write docker-compose.yml file          │
+              └───────────────────────────────────────────┘
+```
+
+This diagram shows how the ContainDB export feature captures the configuration of your running containers without copying the actual data stored in volumes. The generated docker-compose.yml provides a template for recreating your database infrastructure but requires separate data migration for full restoration.
+
+---------------------------------------
 
 ## Architecture
 
@@ -222,9 +312,50 @@ For tools like phpMyAdmin, pgAdmin, or MongoDB Compass, ContainDB handles:
                                             ▼
                                   ┌─────────────────────┐
                                   │ Management Tool     │
-                                  │ Container/App       │
+                                  │ Container/App       |
                                   └─────────────────────┘
 ```
+
+---------------------------------------
+
+4. **Auto-Rollback Mechanism**
+
+ContainDB implements a robust error handling system that automatically cleans up any partially created resources if something goes wrong:
+
+```
+┌────────────────────────────┐
+│ Operation Started          │
+└─────────────┬──────────────┘
+              │
+              ▼
+┌────────────────────────────┐
+│ Resource Creation          │
+└─────────────┬──────────────┘
+              │
+              ▼
+      ┌───────/\───────┐
+      │ Error Occurs?  │
+      └───────┬\───────┘
+              │
+          Yes │             ┌─────────────────────┐
+              ├─────────────> Stop Containers     │
+              │             └─────────┬───────────┘
+              │                       │
+              │             ┌─────────▼───────────┐
+              │             │ Remove Containers   │
+              │             └─────────┬───────────┘
+              │                       │
+              │             ┌─────────▼───────────┐
+              │             │ Clean Temp Files    │
+              │             └─────────────────────┘
+              │
+         No   ▼
+┌────────────────────────────┐
+│ Operation Completed        │
+└────────────────────────────┘
+```
+
+This ensures your system stays clean even if an operation fails midway, preventing orphaned containers or dangling resources.
 
 ---------------------------------------
 
@@ -239,6 +370,8 @@ ContainDB was created after I found myself repeatedly setting up the same databa
 
 The final straw came when I needed to set up a multi-database project that required MongoDB, PostgreSQL, and Redis - all with different configurations, management tools, and persistence requirements. I spent hours on environment setup instead of actual coding.
 
+**The MongoDB Crisis:** The breaking point was when I tried to deploy MongoDB on a new Debian-based system. Instead of a working database, I got the cryptic "Illegal instruction (core dumped)" error - a common issue on certain Debian systems due to CPU instruction set incompatibilities with pre-built MongoDB binaries. After wasting a full day on troubleshooting this single issue, I realized containerization was the answer.
+
 I realized that these repetitive tasks could be automated, and ContainDB was born. What started as a personal script evolved into a comprehensive tool that I now use daily and want to share with the developer community.
 
 ## How ContainDB Helps in Daily Development
@@ -250,6 +383,8 @@ ContainDB has become an essential part of my development workflow by:
 - **Simplifying Management**: Providing easy access to admin tools and interfaces
 - **Isolating Services**: Preventing conflicts between different database versions
 - **Managing Resources**: Making cleanup and maintenance straightforward
+- **Bypassing System Compatibility Issues**: Avoiding the notorious MongoDB "core dumped" errors on Debian systems
+- **Visual Database Management**: Quick setup of GUI tools like RedisInsight for better productivity
 
 Real-world example: When working on a new microservice project, I can spin up a PostgreSQL instance, link it to pgAdmin, and have a fully functional development environment in less than a minute - all with proper network configuration and persistence.
 
@@ -264,16 +399,6 @@ Real-world example: When working on a new microservice project, I can spin up a 
 | **"Port Already in Use"** | Choose a different port when prompted |
 | **"Volume Already Exists"** | Select to reuse or recreate the volume |
 | **"Cannot Connect to Database"** | Check network settings and credentials |
-
-### Debug Information
-
-If you encounter issues, run:
-
-```bash
-sudo containDB --debug
-```
-
-This will provide verbose output to help diagnose problems.
 
 ## Contributing
 
@@ -295,6 +420,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - The Docker team for creating an amazing containerization platform
 - The Go community for providing excellent libraries and tools
+- Redis Labs for the RedisInsight tool
 - All contributors who have helped improve ContainDB
 
 ---
@@ -306,4 +432,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
     <a href="https://github.com/AnkanSaha/ContainDB/issues">🐞 Report Bug</a> •
     <a href="https://github.com/AnkanSaha/ContainDB/issues">✨ Request Feature</a>
   </p>
+</div>
 </div>

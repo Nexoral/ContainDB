@@ -16,6 +16,7 @@ func FlagHandler() {
 		fmt.Println("  --help             Show this help message")
 		fmt.Println("  --install-docker   Install Docker if not installed")
 		fmt.Println("  --uninstall-docker Uninstall Docker if installed")
+		fmt.Println("  --export   Export Docker Compose file with all running services")
 		os.Exit(0) // Exit after handling flags
 	} else if len(os.Args) > 1 && os.Args[1] == "--install-docker" {
 		if !Docker.IsDockerInstalled() {
@@ -39,6 +40,21 @@ func FlagHandler() {
 			fmt.Println("Failed to uninstall Docker:", err)
 		}
 		fmt.Println("Docker uninstalled successfully! Please restart the terminal or log out & log in again.")
+		os.Exit(0) // Exit after handling flags
+	} else if len(os.Args) > 1 && os.Args[1] == "--export" {
+		fmt.Println("Exporting Docker Compose file with all running services...")
+		fmt.Println("\n⚠️  IMPORTANT: The export functionality only exports container configurations, not the actual data.")
+		fmt.Println("   Even if you used data persistence during installation, the exported compose file only")
+		fmt.Println("   references local volume paths from your current machine which won't exist on other systems.")
+		fmt.Println("   For data backup, please use each database's native backup tools.\n")
+
+		filePath := Docker.MakeDockerComposeWithAllServices()
+		if filePath == "" {
+			fmt.Println("Failed to create Docker Compose file.")
+		} else {
+			fmt.Println("\n✅ Docker Compose file created successfully at:", filePath)
+			fmt.Println("   This file contains only the configuration of your containers.")
+		}
 		os.Exit(0) // Exit after handling flags
 	} else if len(os.Args) == 0 {
 		return // No flags to handle, continue with normal execution
