@@ -108,4 +108,9 @@ readme_file="$(dirname "$0")/../README.md"
 sed -i "s|^\(\s*wget .*/releases/download/v\)[^/]*\(/containDB_\)[^_]*\(_amd64\.deb\)|\1${new_version}-${suffix}\2${new_version}-${suffix}\3|" "$readme_file"
 sed -i "s|^\(\s*sudo dpkg -i containDB_\)[^_]*\(_amd64\.deb\)|\1${new_version}-${suffix}\2|" "$readme_file"
 
-echo "Updated README.md with new version in installation URLs."
+# Update version in installation.md file
+installation_file="$(dirname "$0")/../INSTALLATION.md"
+sed -i "s|^\(\s*wget .*/releases/download/v\)[^/]*\(/containDB_\)[^_]*\(_amd64\.deb\)|\1${new_version}-${suffix}\2${new_version}-${suffix}\3|" "$installation_file"
+sed -i "s|^\(\s*sudo dpkg -i containDB_\)[^_]*\(_amd64\.deb\)|\1${new_version}-${suffix}\2|" "$installation_file"
+
+echo "Updated INSTALLATION.md with new version in installation URLs."
