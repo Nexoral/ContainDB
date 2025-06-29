@@ -1,4 +1,4 @@
-package Docker;
+package Docker
 
 import (
 	"fmt"
@@ -38,7 +38,7 @@ func checkDockerInstallation() error {
 	if err != nil {
 		return fmt.Errorf("docker is not installed or not accessible: %v", err)
 	}
-	
+
 	fmt.Printf("Docker is available: %s\n", strings.TrimSpace(string(output)))
 	return nil
 }
@@ -46,38 +46,38 @@ func checkDockerInstallation() error {
 func checkRAM(minGB float64) error {
 	var m runtime.MemStats
 	runtime.ReadMemStats(&m)
-	
-	totalRAM := float64(m.TotalAlloc) / (1024 * 1024 * 1024) // Convert to GB
+
+	totalRAM := float64(m.TotalAlloc) / (1024 * 1024 * 1024)      // Convert to GB
 	availableRAM := float64(m.Sys-m.Alloc) / (1024 * 1024 * 1024) // Convert to GB
 
 	if availableRAM < minGB {
 		return fmt.Errorf("insufficient RAM. Available: %.2f GB, Required: %.2f GB", availableRAM, minGB)
 	}
-	
+
 	fmt.Printf("RAM check passed. Total: %.2f GB, Available: %.2f GB\n", totalRAM, availableRAM)
 	return nil
 }
 
 func checkDiskSpace(minGB float64) error {
 	var path string
-	
+
 	if runtime.GOOS == "windows" {
 		path = "C:\\"
 	} else {
 		path = "/"
 	}
-	
+
 	cmd := exec.Command("df", "-h", path)
 	if runtime.GOOS == "windows" {
 		// For Windows, use a different command
 		cmd = exec.Command("powershell", "-Command", "Get-PSDrive C | Select-Object Free")
 	}
-	
+
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("failed to check disk space: %v", err)
 	}
-	
+
 	// Parse the output to get available space
 	// This is a simplified approach and may need adjustments based on actual output format
 	outputStr := string(output)
@@ -109,11 +109,11 @@ func checkDiskSpace(minGB float64) error {
 			}
 		}
 	}
-	
+
 	if freeGB < minGB {
 		return fmt.Errorf("insufficient disk space. Available: %.2f GB, Required: %.2f GB", freeGB, minGB)
 	}
-	
+
 	fmt.Printf("Disk space check passed. Available: %.2f GB\n", freeGB)
 	return nil
 }
