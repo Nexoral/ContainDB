@@ -16,7 +16,6 @@ func StartContainer(database string) {
 		"redis":      "redis",
 		"mysql":      "mysql",
 		"postgresql": "postgres",
-		"cassandra":  "cassandra",
 		"mariadb":    "mariadb",
 	}
 
@@ -25,7 +24,6 @@ func StartContainer(database string) {
 		"redis":      "6379",
 		"mysql":      "3306",
 		"postgresql": "5432",
-		"cassandra":  "9042",
 		"mariadb":    "3306",
 	}
 
@@ -70,7 +68,6 @@ func StartContainer(database string) {
 			"redis":      "/data",
 			"mysql":      "/var/lib/mysql",
 			"postgresql": "/var/lib/postgresql/data",
-			"cassandra":  "/var/lib/cassandra",
 			"mariadb":    "/var/lib/mysql",
 		}
 		volName := fmt.Sprintf("%s-data", database)

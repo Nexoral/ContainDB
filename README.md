@@ -93,7 +93,6 @@ You'll be greeted with an attractive banner and a simple menu system that guides
 | PostgreSQL | pgAdmin          |
 | MariaDB    | (uses phpMyAdmin)|
 | Redis      |                  |
-| Cassandra  |                  |
 
 ## Usage Examples
 
@@ -344,4 +343,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
     <a href="https://github.com/AnkanSaha/ContainDB/issues">🐞 Report Bug</a> •
     <a href="https://github.com/AnkanSaha/ContainDB/issues">✨ Request Feature</a>
   </p>
+</div>
 </div>

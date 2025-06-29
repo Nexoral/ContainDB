@@ -68,7 +68,7 @@ func RemoveDatabase(name string) error {
 func ListDatabaseImages() ([]string, error) {
 	// List of common database images used by ContainDB
 	dbImages := []string{
-		"mongo", "mysql", "postgres", "redis", "cassandra",
+		"mongo", "mysql", "postgres", "redis",
 		"mariadb", "phpmyadmin", "dpage/pgadmin4",
 	}
 
@@ -135,7 +135,7 @@ func ListContainDBVolumes() ([]string, error) {
 	// Common volume prefixes used by ContainDB
 	prefixes := []string{
 		"mongodb-data", "mysql-data", "postgresql-data", "redis-data",
-		"cassandra-data", "mariadb-data",
+		"mariadb-data",
 	}
 
 	cmd := exec.Command("docker", "volume", "ls", "--format", "{{.Name}}")
