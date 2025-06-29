@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	VERSION := "4.12.18-stable"
+	VERSION := "4.12.19-stable"
 
 	// handle version flag without requiring sudo
 	if len(os.Args) > 1 && os.Args[1] == "--version" {
