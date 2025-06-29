@@ -25,6 +25,9 @@ As developers, we often face these frustrating scenarios:
 - Struggling with complex Docker commands for simple database tasks
 - Managing database persistence, networking, and tools separately
 - Lack of a unified interface for different database systems
+- **MongoDB "Core Dumped" errors on Debian-based systems** that are nearly impossible for beginners to troubleshoot
+
+This last point was a major motivation for creating ContainDB. As a developer working on Debian-based systems, I repeatedly encountered the dreaded "Core Dumped" error when trying to install MongoDB natively. After spending countless hours troubleshooting compatibility issues, library dependencies, and system configurations, I realized there needed to be a better way.
 
 ContainDB was born out of these pain points. I wanted a simple CLI tool that could handle all database container operations with minimal effort, allowing me to focus on actual development rather than environment setup.
 
@@ -43,6 +46,7 @@ ContainDB is an open-source CLI tool that automates the creation, management, an
 - **📊 Management Tools**: One-click setup for phpMyAdmin, pgAdmin, and MongoDB Compass
 - **🧹 Easy Cleanup**: Simple commands to remove containers, images, and volumes
 - **🧠 Smart Detection**: Checks for existing resources to avoid conflicts
+- **🔄 Auto-Rollback**: Automatic cleanup of resources if any errors occur during setup
 
 ## Installation
 
@@ -228,6 +232,47 @@ For tools like phpMyAdmin, pgAdmin, or MongoDB Compass, ContainDB handles:
 
 ---------------------------------------
 
+4. **Auto-Rollback Mechanism**
+
+ContainDB implements a robust error handling system that automatically cleans up any partially created resources if something goes wrong:
+
+```
+┌────────────────────────────┐
+│ Operation Started          │
+└─────────────┬──────────────┘
+              │
+              ▼
+┌────────────────────────────┐
+│ Resource Creation          │
+└─────────────┬──────────────┘
+              │
+              ▼
+      ┌───────/\───────┐
+      │ Error Occurs?  │
+      └───────┬\───────┘
+              │
+          Yes │             ┌─────────────────────┐
+              ├─────────────> Stop Containers     │
+              │             └─────────┬───────────┘
+              │                       │
+              │             ┌─────────▼───────────┐
+              │             │ Remove Containers   │
+              │             └─────────┬───────────┘
+              │                       │
+              │             ┌─────────▼───────────┐
+              │             │ Clean Temp Files    │
+              │             └─────────────────────┘
+              │
+         No   ▼
+┌────────────────────────────┐
+│ Operation Completed        │
+└────────────────────────────┘
+```
+
+This ensures your system stays clean even if an operation fails midway, preventing orphaned containers or dangling resources.
+
+---------------------------------------
+
 ## The Origin Story
 
 ContainDB was created after I found myself repeatedly setting up the same database environments across different projects. The challenges included:
@@ -238,6 +283,8 @@ ContainDB was created after I found myself repeatedly setting up the same databa
 4. Setting up administration tools for each database type
 
 The final straw came when I needed to set up a multi-database project that required MongoDB, PostgreSQL, and Redis - all with different configurations, management tools, and persistence requirements. I spent hours on environment setup instead of actual coding.
+
+**The MongoDB Crisis:** The breaking point was when I tried to deploy MongoDB on a new Debian-based system. Instead of a working database, I got the cryptic "Illegal instruction (core dumped)" error - a common issue on certain Debian systems due to CPU instruction set incompatibilities with pre-built MongoDB binaries. After wasting a full day on troubleshooting this single issue, I realized containerization was the answer.
 
 I realized that these repetitive tasks could be automated, and ContainDB was born. What started as a personal script evolved into a comprehensive tool that I now use daily and want to share with the developer community.
 
@@ -250,6 +297,7 @@ ContainDB has become an essential part of my development workflow by:
 - **Simplifying Management**: Providing easy access to admin tools and interfaces
 - **Isolating Services**: Preventing conflicts between different database versions
 - **Managing Resources**: Making cleanup and maintenance straightforward
+- **Bypassing System Compatibility Issues**: Avoiding the notorious MongoDB "core dumped" errors on Debian systems
 
 Real-world example: When working on a new microservice project, I can spin up a PostgreSQL instance, link it to pgAdmin, and have a fully functional development environment in less than a minute - all with proper network configuration and persistence.
 
@@ -264,16 +312,6 @@ Real-world example: When working on a new microservice project, I can spin up a 
 | **"Port Already in Use"** | Choose a different port when prompted |
 | **"Volume Already Exists"** | Select to reuse or recreate the volume |
 | **"Cannot Connect to Database"** | Check network settings and credentials |
-
-### Debug Information
-
-If you encounter issues, run:
-
-```bash
-sudo containDB --debug
-```
-
-This will provide verbose output to help diagnose problems.
 
 ## Contributing
 
