@@ -114,3 +114,10 @@ sed -i "s|^\(\s*wget .*/releases/download/v\)[^/]*\(/containDB_\)[^_]*\(_amd64\.
 sed -i "s|^\(\s*sudo dpkg -i containDB_\)[^_]*\(_amd64\.deb\)|\1${new_version}-${suffix}\2|" "$installation_file"
 
 echo "Updated INSTALLATION.md with new version in installation URLs."
+
+# Update version in LEARN.md file
+learn_file="$(dirname "$0")/../LEARN.md"
+sed -i "s|^\(\s*wget .*/releases/download/v\)[^/]*\(/containDB_\)[^_]*\(_amd64\.deb\)|\1${new_version}-${suffix}\2${new_version}-${suffix}\3|" "$learn_file"
+sed -i "s|^\(\s*sudo dpkg -i containDB_\)[^_]*\(_amd64\.deb\)|\1${new_version}-${suffix}\2|" "$learn_file"
+
+echo "Updated LEARN.md with new version in installation URLs."
