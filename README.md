@@ -10,7 +10,7 @@
     <a href="#troubleshooting">Troubleshooting</a>
   </p>
   
-  ![Version](https://img.shields.io/badge/version-4.12.17--stable-blue)
+  ![Version](https://img.shields.io/badge/version-5.12.22-stable-blue)
   ![License](https://img.shields.io/badge/license-MIT-green)
   ![Go Version](https://img.shields.io/badge/go-%3E%3D1.18-blue)
   ![Platform](https://img.shields.io/badge/platform-linux-lightgrey)
