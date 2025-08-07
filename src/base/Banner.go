@@ -7,7 +7,7 @@ import (
 	"github.com/fatih/color"
 )
 
-const Version = "5.12.23-stable"
+const Version = "5.12.24-stable"
 
 func ShowBanner() {
 	// Define styles
@@ -25,7 +25,7 @@ func ShowBanner() {
 	// Banner
 	termWidth := 80 // Default width, could be made dynamic with terminal size detection
 
-	welcomeMsg := "An Awesome Project to Manage Your Databases in Containers by Ankan Saha"
+	welcomeMsg := "An Awesome Project to Manage Your Databases in Containers"
 	padding := (termWidth - len(welcomeMsg)) / 2
 
 	banner := "\n" + strings.Repeat(" ", padding) +
