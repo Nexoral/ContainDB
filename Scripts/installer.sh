@@ -7,7 +7,7 @@ ARCH=$(dpkg --print-architecture)
 
 echo "Detected architecture: $ARCH"
 
-VERSION="5.12.26-stable"
+VERSION="5.12.27-stable"
 
 if [[ "$ARCH" == "amd64" ]]; then
   PKG="containDB_${VERSION}_amd64.deb"
@@ -21,12 +21,29 @@ else
 fi
 
 URL="https://github.com/AnkanSaha/ContainDB/releases/download/${VERSION}/${PKG}"
+echo "Downloading package: $PKG from $URL"
 
 # Download package
 wget -q $URL -O /tmp/$PKG
 
+# shellcheck disable=SC2181
+if [[ $? -ne 0 ]]; then
+  echo "Failed to download package from $URL"
+  exit 1
+fi
+
+echo "Download completed."
+
 # Install package
 sudo dpkg -i /tmp/$PKG
+
+# shellcheck disable=SC2181
+if [[ $? -ne 0 ]]; then
+  echo "Failed to install package $PKG"
+  exit 1
+fi
+
+echo "Installation completed successfully."
 
 # Clean up
 rm /tmp/$PKG
