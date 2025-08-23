@@ -54,7 +54,6 @@ ContainDB is an open-source CLI tool that automates the creation, management, an
 ### Option 1: Using the Debian Package (Recommended)
 
 ```bash
-# Install the package
 curl -fsSL https://raw.githubusercontent.com/AnkanSaha/ContainDB/main/Scripts/installer.sh | sudo bash -
 
 ```

@@ -1,18 +1,21 @@
 package base
 
 import (
+	"fmt"
+	"os"
+
 	"ContainDB/src/Docker"
 	"ContainDB/src/tools"
-	"fmt"
 
 	"github.com/manifoldco/promptui"
+	"os/exec"
 )
 
 func BaseCaseHandler() {
 	// Top-level action menu
 	actionPrompt := promptui.Select{
 		Label: "What do you want to do?",
-		Items: []string{"Install Database", "List Databases", "Remove Database", "Remove Image", "Remove Volume", "Import Services", "Export Services", "Exit"},
+		Items: []string{"Install Database", "List Databases", "Remove Database", "Remove Image", "Remove Volume", "Import Services", "Export Services", "Update ContainDB", "Exit"},
 	}
 	_, action, err := actionPrompt.Run()
 	if err != nil {
@@ -219,6 +222,17 @@ func BaseCaseHandler() {
 			return
 		}
 		fmt.Println("Services imported and started successfully!")
+
+	// Handle update case
+	case "Update ContainDB":
+		fmt.Println("Checking for ContainDB updates...")
+		command := exec.Command("bash", "-c", "curl -fsSL https://raw.githubusercontent.com/AnkanSaha/ContainDB/main/Scripts/installer.sh | sudo bash -")
+		command.Stdout = os.Stdout
+		command.Stderr = os.Stderr
+		if err := command.Run(); err != nil {
+			fmt.Println("Error updating ContainDB:", err)
+			return
+		}
 
 	// Handle exit case
 	case "Exit":

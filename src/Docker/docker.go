@@ -50,7 +50,7 @@ func RemoveDatabase(name string) error {
 		return fmt.Errorf("error removing container: %v", err)
 	}
 
-	// If user chose to delete volumes and we could identify the database type, remove named volume
+	// If user chose to delete volumes, and we could identify the database type, remove named volume
 	if deleteVolumes && containerType != "" {
 		volumeName := fmt.Sprintf("%s-data", containerType)
 		if VolumeExists(volumeName) {
