@@ -56,7 +56,7 @@ ContainDB is an open-source CLI tool that automates the creation, management, an
 
 ```bash
 # Install the package
-curl -fsSL https://github.com/AnkanSaha/ContainDB/blob/main/Scripts/installer.sh | sudo bash -
+curl -fsSL https://raw.githubusercontent.com/AnkanSaha/ContainDB/main/Scripts/installer.sh | sudo bash -
 
 ```
 
