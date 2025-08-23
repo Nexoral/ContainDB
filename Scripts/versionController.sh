@@ -121,3 +121,8 @@ sed -i "s|^\(\s*wget .*/releases/download/v\)[^/]*\(/containDB_\)[^_]*\(_amd64\.
 sed -i "s|^\(\s*sudo dpkg -i containDB_\)[^_]*\(_amd64\.deb\)|\1${new_version}-${suffix}\2|" "$learn_file"
 
 echo "Updated LEARN.md with new version in installation URLs."
+
+# Update version in SCRIPTS/installer.sh
+installer_file="$(dirname "$0")/../Scripts/installer.sh"
+sed -i "s|^\(VERSION=\"\)[^\"']*\(\".*\)$|\1${new_version}-${suffix}\2|" "$installer_file"
+echo "Updated installer.sh with new version."
