@@ -55,11 +55,9 @@ ContainDB is an open-source CLI tool that automates the creation, management, an
 ### Option 1: Using the Debian Package (Recommended)
 
 ```bash
-# Download latest .deb release
-wget https://github.com/AnkanSaha/ContainDB/releases/download/v5.12.24-stable/containDB_5.12.24-stable_amd64.deb
-
 # Install the package
-sudo dpkg -i containDB_5.12.24-stable_amd64.deb
+curl -fsSL https://github.com/AnkanSaha/ContainDB/blob/main/Scripts/installer.sh | sudo bash -
+
 ```
 
 ### Option 2: Build from Source
@@ -72,8 +70,11 @@ cd ContainDB
 # Build the CLI
 ./Scripts/BinBuilder.sh
 
-# Install binary to /usr/local/bin
-sudo mv ./bin/containDB /usr/local/bin/
+# Build Package (Debian)
+./Scripts/PackageBuilder.sh
+
+# Install the package the generated .deb file under the Packages directory
+sudo dpkg -i Packages/containDB_*.deb
 ```
 
 ## Quick Start
