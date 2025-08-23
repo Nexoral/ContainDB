@@ -7,7 +7,7 @@ ARCH=$(dpkg --print-architecture)
 
 echo "Detected architecture: $ARCH"
 
-VERSION="5.12.25-stable"
+VERSION="5.12.26-stable"
 
 if [[ "$ARCH" == "amd64" ]]; then
   PKG="containDB_${VERSION}_amd64.deb"
