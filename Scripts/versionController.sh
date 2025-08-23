@@ -124,5 +124,5 @@ echo "Updated LEARN.md with new version in installation URLs."
 
 # Update version in SCRIPTS/installer.sh
 installer_file="$(dirname "$0")/../Scripts/installer.sh"
-sed -i "s|^\(VERSION=\"\)[^\"']*\(\".*\)$|\1v${new_version}-${suffix}\2|" "$installer_file"
+sed -i "s|^\(VERSION=\"\)[^\"']*\(\".*\)$|\1${new_version}-${suffix}\2|" "$installer_file"
 echo "Updated installer.sh with new version."
