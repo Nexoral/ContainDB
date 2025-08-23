@@ -1,14 +1,13 @@
 package base
 
 import (
-	"fmt"
-	"os"
-
 	"ContainDB/src/Docker"
 	"ContainDB/src/tools"
+	"fmt"
+	"os"
+	"os/exec"
 
 	"github.com/manifoldco/promptui"
-	"os/exec"
 )
 
 func BaseCaseHandler() {

@@ -1,15 +1,14 @@
 package main
 
 import (
+	"ContainDB/src/Docker"
+	"ContainDB/src/base"
+	"ContainDB/src/tools"
 	"fmt"
 	"os"
 	"os/exec"
 	"os/signal"
 	"strings"
-
-	"ContainDB/src/Docker"
-	"ContainDB/src/base"
-	"ContainDB/src/tools"
 )
 
 func main() {
