@@ -7,14 +7,14 @@ ARCH=$(dpkg --print-architecture)
 
 echo "Detected architecture: $ARCH"
 
-VERSION="5.12.27-stable"
+VERSION="5.12.28-stable"
 
 if [[ "$ARCH" == "amd64" ]]; then
-  PKG="containDB_${VERSION}_amd64.deb"
+  PKG="containdb_${VERSION}_amd64.deb"
 elif [[ "$ARCH" == "arm64" ]]; then
-  PKG="containDB_${VERSION}_arm64.deb"
+  PKG="containdb_${VERSION}_arm64.deb"
 elif [[ "$ARCH" == "i386" ]]; then
-  PKG="containDB_${VERSION}_i386.deb"
+  PKG="containdb_${VERSION}_i386.deb"
 else
   echo "Unsupported architecture: $ARCH"
   exit 1
