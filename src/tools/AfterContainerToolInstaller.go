@@ -1,9 +1,8 @@
 package tools
 
 import (
-	"fmt"
-
 	"ContainDB/src/Docker"
+	"fmt"
 )
 
 // AfterContainerToolInstaller provides post-installation setup for database management tools.
