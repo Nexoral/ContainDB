@@ -50,10 +50,10 @@ ContainDB can be installed using the Debian package or built from source.
 #### Using the Debian Package
 ```bash
 # Download latest .deb release
-wget https://github.com/AnkanSaha/ContainDB/releases/download/v5.12.28-stable/containDB_5.12.28-stable_amd64.deb
+wget https://github.com/AnkanSaha/ContainDB/releases/download/v5.12.29-stable/containDB_5.12.29-stable_amd64.deb
 
 # Install the package
-sudo dpkg -i containDB_5.12.28-stable_amd64.deb
+sudo dpkg -i containDB_5.12.29-stable_amd64.deb
 ```
 
 #### Build from Source
