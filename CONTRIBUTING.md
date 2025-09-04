@@ -15,7 +15,7 @@ This section guides you through submitting a bug report for ContainDB.
 Before submitting a bug report:
 
 - Check the [documentation](README.md) to see if there's a solution to your problem.
-- Check if the issue has already been reported in our [Issues](https://github.com/AnkanSaha/ContainDB/issues) section.
+- Check if the issue has already been reported in our [Issues](https://github.com/Nexoral/ContainDB/issues) section.
 
 When submitting a bug report:
 

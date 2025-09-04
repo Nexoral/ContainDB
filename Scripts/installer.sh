@@ -7,7 +7,7 @@ ARCH=$(dpkg --print-architecture)
 
 echo "Detected architecture: $ARCH"
 
-VERSION="5.13.30-stable"
+VERSION="5.13.31-stable"
 
 if [[ "$ARCH" == "amd64" ]]; then
   PKG="containdb_${VERSION}_amd64.deb"
@@ -20,7 +20,7 @@ else
   exit 1
 fi
 
-URL="https://github.com/AnkanSaha/ContainDB/releases/download/v${VERSION}/${PKG}"
+URL="https://github.com/Nexoral/ContainDB/releases/download/v${VERSION}/${PKG}"
 echo "Downloading package: $PKG from $URL"
 
 # Download package

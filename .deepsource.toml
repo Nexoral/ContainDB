@@ -4,7 +4,7 @@ version = 1
 name = "go"
 
   [analyzers.meta]
-  import_root = "github.com/AnkanSaha/ContainDB"
+  import_root = "github.com//ContainDB"
 
 [[transformers]]
 name = "gofmt"
