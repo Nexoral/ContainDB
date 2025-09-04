@@ -225,7 +225,7 @@ func BaseCaseHandler() {
 	// Handle update case
 	case "Update ContainDB":
 		fmt.Println("Checking for ContainDB updates...")
-		command := exec.Command("bash", "-c", "curl -fsSL https://raw.githubusercontent.com/AnkanSaha/ContainDB/main/Scripts/installer.sh | sudo bash -")
+		command := exec.Command("bash", "-c", "curl -fsSL https://raw.githubusercontent.com/Nexoral/ContainDB/main/Scripts/installer.sh | sudo bash -")
 		command.Stdout = os.Stdout
 		command.Stderr = os.Stderr
 		if err := command.Run(); err != nil {

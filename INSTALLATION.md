@@ -19,7 +19,7 @@ This is the simplest method for Debian-based systems like Ubuntu, Debian, Linux 
 
 ```bash
 # Download the latest .deb release
-wget https://github.com/AnkanSaha/ContainDB/releases/download/v5.13.30-stable/containDB_5.13.30-stable_amd64.deb
+wget https://github.com/Nexoral/ContainDB/releases/download/v5.13.30-stable/containDB_5.13.30-stable_amd64.deb
 
 # Install the package
 sudo dpkg -i containDB_5.13.30-stable_amd64.deb
@@ -32,7 +32,7 @@ sudo apt-get install -f
 
 ```bash
 # Download the latest tar.gz release
-wget https://github.com/AnkanSaha/ContainDB/releases/download/v4.12.18-stable/containDB_4.12.18-stable_amd64.tar.gz
+wget https://github.com/Nexoral/ContainDB/releases/download/v4.12.18-stable/containDB_4.12.18-stable_amd64.tar.gz
 
 # Extract the archive
 tar -xzf containDB_4.12.18-stable_amd64.tar.gz
@@ -58,7 +58,7 @@ sudo apt-get install golang-go
 sudo dnf install golang
 
 # Clone the repository
-git clone https://github.com/AnkanSaha/ContainDB.git
+git clone https://github.com/Nexoral/ContainDB.git
 cd ContainDB
 
 # Build the CLI
@@ -88,7 +88,7 @@ ContainDB requires Docker to run. If Docker is not installed on your system, Con
 
 ```bash
 # Download the new version
-wget https://github.com/AnkanSaha/ContainDB/releases/download/v[NEW_VERSION]/containDB_[NEW_VERSION]_amd64.deb
+wget https://github.com/Nexoral/ContainDB/releases/download/v[NEW_VERSION]/containDB_[NEW_VERSION]_amd64.deb
 
 # Install the update
 sudo dpkg -i containDB_[NEW_VERSION]_amd64.deb
@@ -98,7 +98,7 @@ sudo dpkg -i containDB_[NEW_VERSION]_amd64.deb
 
 ```bash
 # Download the new version
-wget https://github.com/AnkanSaha/ContainDB/releases/download/v[NEW_VERSION]/containDB_[NEW_VERSION]_amd64.tar.gz
+wget https://github.com/Nexoral/ContainDB/releases/download/v[NEW_VERSION]/containDB_[NEW_VERSION]_amd64.tar.gz
 
 # Extract the archive
 tar -xzf containDB_[NEW_VERSION]_amd64.tar.gz
@@ -157,4 +157,4 @@ If you encounter Docker-related errors:
 2. Ensure Docker service is running: `sudo systemctl status docker`
 3. Check that your user has permission to use Docker: `sudo usermod -aG docker $USER`
 
-For additional installation help, please [open an issue](https://github.com/AnkanSaha/ContainDB/issues) on our GitHub repository.
+For additional installation help, please [open an issue](https://github.com/Nexoral/ContainDB/issues) on our GitHub repository.

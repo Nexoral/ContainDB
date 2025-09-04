@@ -47,9 +47,9 @@ func ShowBanner() {
 	// Info Block
 	fmt.Printf("%s %s\n", boldCyan("📦 Version:"), white(Version))
 	fmt.Printf("%s %s\n", boldCyan("👨‍💻 Author:"), white("Ankan Saha"))
-	fmt.Printf("%s %s\n", boldCyan("🔗 GitHub:"), cyan("https://github.com/AnkanSaha/ContainDB"))
+	fmt.Printf("%s %s\n", boldCyan("🔗 GitHub:"), cyan("https://github.com/Nexoral/ContainDB"))
 	fmt.Printf("%s %s\n", boldCyan("💖 Sponsor:"), cyan("https://github.com/sponsors/AnkanSaha"))
-	fmt.Printf("%s %s\n", boldCyan("📄 Docs:"), cyan("https://github.com/AnkanSaha/ContainDB/wiki"))
+	fmt.Printf("%s %s\n", boldCyan("📄 Docs:"), cyan("https://github.com/Nexoral/ContainDB/wiki"))
 	fmt.Printf("%s %s\n", boldCyan("🔐 License:"), white("MIT License"))
 	fmt.Printf("%s %s\n", boldCyan("💬 Feedback:"), white("Feel free to open issues or discussions on GitHub"))
 

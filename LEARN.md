@@ -49,13 +49,13 @@ ContainDB can be installed using the Debian package or built from source.
 
 #### Using the Debian Package
 ```bash
-curl -fsSL https://raw.githubusercontent.com/AnkanSaha/ContainDB/main/Scripts/installer.sh | sudo bash -
+curl -fsSL https://raw.githubusercontent.com/Nexoral/ContainDB/main/Scripts/installer.sh | sudo bash -
 ```
 
 #### Build from Source
 ```bash
 # Clone the repository
-git clone https://github.com/AnkanSaha/ContainDB.git
+git clone https://github.com/Nexoral/ContainDB.git
 cd ContainDB
 
 # Build the CLI

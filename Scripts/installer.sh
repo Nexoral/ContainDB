@@ -20,7 +20,7 @@ else
   exit 1
 fi
 
-URL="https://github.com/AnkanSaha/ContainDB/releases/download/v${VERSION}/${PKG}"
+URL="https://github.com/Nexoral/ContainDB/releases/download/v${VERSION}/${PKG}"
 echo "Downloading package: $PKG from $URL"
 
 # Download package
