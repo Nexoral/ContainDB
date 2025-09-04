@@ -7,7 +7,7 @@ import (
 	"github.com/fatih/color"
 )
 
-const Version = "5.13.30-stable"
+const Version = "5.13.31-stable"
 
 func ShowBanner() {
 	// Define styles
