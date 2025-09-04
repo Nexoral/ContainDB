@@ -490,7 +490,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 <div align="center">
-  <p>Made with ❤️ by <a href="https://github.com/Nexoral">Ankan Saha</a></p>
+  <p>Made with ❤️ by <a href="https://github.com/AnkanSaha">Ankan Saha</a></p>
   <p>
     <a href="https://github.com/Nexoral/ContainDB/stargazers">⭐ Star this project</a> •
     <a href="https://github.com/Nexoral/ContainDB/issues">🐞 Report Bug</a> •
