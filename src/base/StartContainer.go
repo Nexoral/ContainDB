@@ -17,6 +17,7 @@ func StartContainer(database string) {
 		"mysql":      "mysql",
 		"postgresql": "postgres",
 		"mariadb":    "mariadb",
+		"axiodb":     "theankansaha/axiodb",
 	}
 
 	defaultPorts := map[string]string{
@@ -25,6 +26,7 @@ func StartContainer(database string) {
 		"mysql":      "3306",
 		"postgresql": "5432",
 		"mariadb":    "3306",
+		"axiodb":     "27018",
 	}
 
 	image := imageMap[database]
@@ -69,6 +71,7 @@ func StartContainer(database string) {
 			"mysql":      "/var/lib/mysql",
 			"postgresql": "/var/lib/postgresql/data",
 			"mariadb":    "/var/lib/mysql",
+			"axiodb":     "/app/AxioDB",
 		}
 		volName := fmt.Sprintf("%s-data", database)
 		// if already exists, ask reuse or recreate
