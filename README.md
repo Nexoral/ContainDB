@@ -54,7 +54,7 @@ ContainDB is an open-source CLI tool that automates the creation, management, an
 ### Option 1: Using the Debian Package (Recommended)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Nexoral/ContainDB/main/Scripts/installer.sh | sudo bash -
+curl -fsSL https://raw.githubusercontent.com/nexoral/ContainDB/main/Scripts/installer.sh | sudo bash -
 
 ```
 
@@ -62,7 +62,7 @@ curl -fsSL https://raw.githubusercontent.com/Nexoral/ContainDB/main/Scripts/inst
 
 ```bash
 # Clone the repository
-git clone https://github.com/Nexoral/ContainDB.git
+git clone https://github.com/nexoral/ContainDB.git
 cd ContainDB
 
 # Build the CLI
@@ -492,9 +492,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 <div align="center">
   <p>Made with ❤️ by <a href="https://github.com/AnkanSaha">Ankan Saha</a></p>
   <p>
-    <a href="https://github.com/Nexoral/ContainDB/stargazers">⭐ Star this project</a> •
-    <a href="https://github.com/Nexoral/ContainDB/issues">🐞 Report Bug</a> •
-    <a href="https://github.com/Nexoral/ContainDB/issues">✨ Request Feature</a>
+    <a href="https://github.com/nexoral/ContainDB/stargazers">⭐ Star this project</a> •
+    <a href="https://github.com/nexoral/ContainDB/issues">🐞 Report Bug</a> •
+    <a href="https://github.com/nexoral/ContainDB/issues">✨ Request Feature</a>
   </p>
 </div>
 </div>
